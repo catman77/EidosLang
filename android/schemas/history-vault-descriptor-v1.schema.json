@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EidoHistoryVaultV1",
+  "type": "object",
+  "required": [
+    "body",
+    "vault_id"
+  ],
+  "additionalProperties": false
+}

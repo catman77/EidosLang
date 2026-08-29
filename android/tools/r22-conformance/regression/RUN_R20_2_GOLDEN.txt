@@ -1,0 +1,7 @@
+PASS fixed R20.2 public identity bundles
+PASS fixed R20.2 recovery-secret export and package signature
+PASS fixed R20.2 recovery unwrap and history-entry decryption
+PASS fixed R20.2 active-device epoch-key grant
+PASS fixed R20.2 cross-device destructive recovery without legacy RSA/key-grant access
+PASS fixed R20.2 wrong recovery secret zero-mutation rejection
+ALL R20.2 FIXED GOLDEN CHECKS PASS

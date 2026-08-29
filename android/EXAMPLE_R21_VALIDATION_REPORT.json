@@ -1,0 +1,82 @@
+{
+  "stage": "R21",
+  "status": "SECURITY_FUZZING_LOCAL_HARDENING_CORE_PASS",
+  "new_module": "core-hardening",
+  "necessity_results": {
+    "raw_recovery_secret_default_backup_removed": true,
+    "fresh_offline_latestness_provable_without_anchor_or_oracle": false,
+    "local_continuity_rollback_guard": true,
+    "legacy_cutover_requires_history_equivalence": true,
+    "legacy_external_copy_deletion_provable_by_software": false,
+    "outstanding_one_time_prekeys_bounded": true,
+    "draft_plaintext_persistence_removed_in_android_source": true
+  },
+  "new_objects": [
+    "EidoHistoryVaultRecoveryBackupV1",
+    "EidoVaultRollbackAnchorV1",
+    "EidoLegacyArchiveCutoverV1"
+  ],
+  "adversarial_controls": {
+    "vault_package_single_character_mutations": 128,
+    "recovery_backup_single_character_mutations": 96,
+    "cross_vault_substitution": true,
+    "entry_header_substitution": true,
+    "missing_parent_signed_archive": true,
+    "skipped_key_dos": true,
+    "prekey_pool_dos": true
+  },
+  "golden": {
+    "sha256": "8088b67350694162f6851b3f0e8a19a382804fb3148ad6ef8d8f25f9d0735350",
+    "expected": {
+      "backup_id": "de94310a0ab89b53463013ebbd9bfe6e6fcd18ad6e687eb08b3a1db7797eab56",
+      "anchor_id": "bb2ba692301792005488b6a2f84595b62cc640a5f68ff1a32c1e087d965d812f",
+      "vault_id": "6e44acc0af3b2b56ac4a5e89914f6cb69b6855a4d597bf02c4eca8715aaed03e",
+      "recovery_key_id": "hvr:ae216c2ef5247a3782c135efa279a3e4cdc61094270f5d2be58c6204b7a612c9"
+    }
+  },
+  "executed_pass_counts": {
+    "r21_dynamic": 11,
+    "r21_fixed_golden": 6,
+    "r21_independent_python": 3,
+    "r20_2_dynamic": 12,
+    "r20_2_fixed": 6,
+    "r20_2_python": 3,
+    "r20_1_dynamic": 11,
+    "r20_1_fixed": 6,
+    "r20_1_python": 3,
+    "r20_dynamic": 11,
+    "r20_recovery": 9,
+    "r20_fixed": 6,
+    "r19_dynamic": 12,
+    "r19_fixed": 3,
+    "r18": 14,
+    "r17": 5,
+    "r16_fixed": 5,
+    "r16_python_bep52": 2,
+    "r16_python_bep44": 3,
+    "r15_fixed": 7,
+    "r14_1": 13
+  },
+  "prior_regression_subtotal": 131,
+  "r21_additions": 20,
+  "total_pass_lines": 151,
+  "claim_boundary": {
+    "fresh_device_global_freshness_claimed": false,
+    "external_legacy_copy_deletion_claimed": false,
+    "sqlite_page_level_encryption_claimed": false,
+    "android_runtime_claimed": false,
+    "real_network_execution_claimed": false
+  },
+  "next_stage": "R22 Product Completion / Android Admission",
+  "source_sha256": {
+    "core-hardening/src/main/java/org/eidolang/core/hardening/RecoveryBackup.kt": "a7ebe2c0bb51678bb6bc821cd76bbb8e0c6f1e9adaca2d5866e4434e42afc8fd",
+    "core-hardening/src/main/java/org/eidolang/core/hardening/RollbackGuard.kt": "6e592584b878c13b93311404fa5fadd36c951fa63f2e4e21b7ab240e4e08b50a",
+    "core-hardening/src/main/java/org/eidolang/core/hardening/Cutover.kt": "467d3b62894c0dc4f875267fd339ffe816171bb61e1bdcd8db95f88bc70457ce",
+    "core-hardening/src/main/java/org/eidolang/core/hardening/AndroidLocalSecretBox.kt": "167ffc561a95fd035bf6277648c50c2f276af2680f0e272d17707e523f7cc5a0",
+    "core-session/src/main/java/org/eidolang/core/session/PreKeys.kt": "135c78a500f4bb77f89673d36069251b3f04cee4406fbe342c83d2e628d3b5fc",
+    "feature-editor/src/main/java/org/eidolang/feature/editor/DraftStore.kt": "0a877b3aa17eefca9bdffb25bc6036a611776cdaa333efa2eeb03f2b80305e8e",
+    "R21_METHODOLOGY.md": "9ec91bf3a35c4fc1c6d39f2c7fa3227124f8cbdf1d5876299ff300793e0d5831",
+    "R21_FRESHNESS_NO_GO.md": "f95bf8bbb56f67a241fe0ddef8799609d5471c51c2d197b3d4ed3a87340e2d2f",
+    "R21_CUTOVER.md": "2d8b621fd20ab0d2de56be9d9c7bd23827fb9047c9bd33126c291c9735219490"
+  }
+}

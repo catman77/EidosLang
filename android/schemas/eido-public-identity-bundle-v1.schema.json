@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EidoPublicIdentityBundleV1",
+  "type": "object",
+  "required": [
+    "bundle_type",
+    "bundle_version",
+    "device",
+    "user"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "bundle_type": {
+      "const": "EidoPublicIdentityBundleV1"
+    },
+    "bundle_version": {
+      "const": "1.0.0"
+    },
+    "user": {
+      "type": "object",
+      "required": [
+        "root_signing_public_key_b64",
+        "signature_algorithm",
+        "user_id"
+      ],
+      "additionalProperties": false
+    },
+    "device": {
+      "type": "object",
+      "required": [
+        "body",
+        "device_id",
+        "root_signature_b64"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

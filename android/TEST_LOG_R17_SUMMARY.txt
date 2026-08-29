@@ -1,0 +1,9 @@
+r17_reference: 5 PASS
+r16_dynamic: 10 PASS
+r16_fixed: 5 PASS
+r16_py_bep52: 2 PASS
+r16_py_bep44: 3 PASS
+r15_fixed: 7 PASS
+r14_1: 13 PASS
+TOTAL: 45 PASS
+Native Android/libtorrent network: NOT RUN / UNRESOLVED

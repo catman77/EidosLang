@@ -1,0 +1,3 @@
+PASS independent Python history-vault package SHA256/ECDSA authentication
+PASS independent Python recovery-wrap/HKDF/history-entry AES-GCM decryption
+PASS independent Python ECDSA-authenticated RSA-OAEP active-device epoch grant

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ArchivePublisherCertificateV1",
+  "type": "object",
+  "required": [
+    "body",
+    "device_signature_b64",
+    "publisher_key_id"
+  ],
+  "additionalProperties": false
+}

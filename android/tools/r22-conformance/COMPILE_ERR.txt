@@ -1,0 +1,3 @@
+mnt/data/eidolang_android_r22/tools/r22-conformance/R22ProductJourney.kt:81:9: warning: variable 'vaultPkg' is never used
+    val vaultPkg=HistoryVaultArchivePackageCodec.parseCanonical(vaultRaw)
+        ^

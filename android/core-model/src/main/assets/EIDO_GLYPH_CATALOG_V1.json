@@ -1,0 +1,2162 @@
+{
+  "catalog_id": "EidoGlyphCatalogV1",
+  "version": "1.0.0",
+  "lineage": {
+    "android_document_slot": "ANDROID_DOCUMENT",
+    "master_manifest_hash": "4667dcd42dec6e14aed1311525488370d141758ca8795aeb2ddfe8aecde57fd3",
+    "production_grammar_hash": "d5afb09e6ecdcff8a4b2c9758af83f215059d1b5bc4ad32da3fb8dd191b69b19",
+    "production_binding_hash": "130eed81541292dfc8ccfd48ba01a28c374cd8fa96285c51fb3ea978d530944a"
+  },
+  "coordinate_system": {
+    "fixed_point_unit": 1000000,
+    "logical_canvas_w_fp": 1000000,
+    "logical_canvas_h_fp": 1000000,
+    "rotation_unit": "mdeg"
+  },
+  "palette": {
+    "palette_id": "PaletteV1",
+    "entries": [
+      {
+        "index": 0,
+        "name": "red",
+        "hex_srgb": "#E53935"
+      },
+      {
+        "index": 1,
+        "name": "orange",
+        "hex_srgb": "#FB8C00"
+      },
+      {
+        "index": 2,
+        "name": "yellow",
+        "hex_srgb": "#FDD835"
+      },
+      {
+        "index": 3,
+        "name": "green",
+        "hex_srgb": "#43A047"
+      },
+      {
+        "index": 4,
+        "name": "cyan",
+        "hex_srgb": "#00ACC1"
+      },
+      {
+        "index": 5,
+        "name": "blue",
+        "hex_srgb": "#1E88E5"
+      },
+      {
+        "index": 6,
+        "name": "violet",
+        "hex_srgb": "#8E24AA"
+      },
+      {
+        "index": 7,
+        "name": "white",
+        "hex_srgb": "#FFFFFF"
+      },
+      {
+        "index": 8,
+        "name": "gray",
+        "hex_srgb": "#9E9E9E"
+      },
+      {
+        "index": 9,
+        "name": "black",
+        "hex_srgb": "#000000"
+      }
+    ]
+  },
+  "constraints": {
+    "arbitrary_rgb_allowed": false,
+    "bitmap_glyphs_allowed": false,
+    "freehand_paths_allowed": false,
+    "float_coordinates_allowed": false,
+    "editable_style_surface": [
+      "glyph_id",
+      "position",
+      "scale",
+      "rotation",
+      "z_index",
+      "group_id"
+    ]
+  },
+  "families": [
+    {
+      "family": "colored_circle",
+      "description": "Filled circles in 10 palette colors and 3 discrete sizes.",
+      "count": 30,
+      "tokens": {
+        "colors": [
+          "red",
+          "orange",
+          "yellow",
+          "green",
+          "cyan",
+          "blue",
+          "violet",
+          "white",
+          "gray",
+          "black"
+        ],
+        "sizes": [
+          "s",
+          "m",
+          "l"
+        ]
+      }
+    },
+    {
+      "family": "black_dot",
+      "description": "Black filled point glyphs in 3 sizes.",
+      "count": 3,
+      "tokens": {
+        "sizes": [
+          "s",
+          "m",
+          "l"
+        ]
+      }
+    },
+    {
+      "family": "black_stick",
+      "description": "Black stick glyphs with 8 poses, 3 lengths, 3 thicknesses.",
+      "count": 72,
+      "tokens": {
+        "poses": [
+          "pose000",
+          "pose045",
+          "pose090",
+          "pose135",
+          "pose180",
+          "pose225",
+          "pose270",
+          "pose315"
+        ],
+        "lengths": [
+          "s",
+          "m",
+          "l"
+        ],
+        "thicknesses": [
+          "thin",
+          "normal",
+          "thick"
+        ]
+      }
+    },
+    {
+      "family": "black_outline",
+      "description": "Black-outline geometric primitives without fill.",
+      "count": 8,
+      "tokens": {
+        "shapes": [
+          "triangle",
+          "square",
+          "rectangle",
+          "diamond",
+          "circle",
+          "ellipse",
+          "cross",
+          "plus"
+        ]
+      }
+    }
+  ],
+  "glyph_count_total": 113,
+  "glyphs": [
+    {
+      "glyph_id": "circle.red.s",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 60000,
+        "fill_palette_index": 0,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "red",
+        "size_token": "s"
+      }
+    },
+    {
+      "glyph_id": "circle.red.m",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 90000,
+        "fill_palette_index": 0,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "red",
+        "size_token": "m"
+      }
+    },
+    {
+      "glyph_id": "circle.red.l",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 135000,
+        "fill_palette_index": 0,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "red",
+        "size_token": "l"
+      }
+    },
+    {
+      "glyph_id": "circle.orange.s",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 60000,
+        "fill_palette_index": 1,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "orange",
+        "size_token": "s"
+      }
+    },
+    {
+      "glyph_id": "circle.orange.m",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 90000,
+        "fill_palette_index": 1,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "orange",
+        "size_token": "m"
+      }
+    },
+    {
+      "glyph_id": "circle.orange.l",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 135000,
+        "fill_palette_index": 1,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "orange",
+        "size_token": "l"
+      }
+    },
+    {
+      "glyph_id": "circle.yellow.s",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 60000,
+        "fill_palette_index": 2,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "yellow",
+        "size_token": "s"
+      }
+    },
+    {
+      "glyph_id": "circle.yellow.m",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 90000,
+        "fill_palette_index": 2,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "yellow",
+        "size_token": "m"
+      }
+    },
+    {
+      "glyph_id": "circle.yellow.l",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 135000,
+        "fill_palette_index": 2,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "yellow",
+        "size_token": "l"
+      }
+    },
+    {
+      "glyph_id": "circle.green.s",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 60000,
+        "fill_palette_index": 3,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "green",
+        "size_token": "s"
+      }
+    },
+    {
+      "glyph_id": "circle.green.m",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 90000,
+        "fill_palette_index": 3,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "green",
+        "size_token": "m"
+      }
+    },
+    {
+      "glyph_id": "circle.green.l",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 135000,
+        "fill_palette_index": 3,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "green",
+        "size_token": "l"
+      }
+    },
+    {
+      "glyph_id": "circle.cyan.s",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 60000,
+        "fill_palette_index": 4,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "cyan",
+        "size_token": "s"
+      }
+    },
+    {
+      "glyph_id": "circle.cyan.m",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 90000,
+        "fill_palette_index": 4,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "cyan",
+        "size_token": "m"
+      }
+    },
+    {
+      "glyph_id": "circle.cyan.l",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 135000,
+        "fill_palette_index": 4,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "cyan",
+        "size_token": "l"
+      }
+    },
+    {
+      "glyph_id": "circle.blue.s",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 60000,
+        "fill_palette_index": 5,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "blue",
+        "size_token": "s"
+      }
+    },
+    {
+      "glyph_id": "circle.blue.m",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 90000,
+        "fill_palette_index": 5,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "blue",
+        "size_token": "m"
+      }
+    },
+    {
+      "glyph_id": "circle.blue.l",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 135000,
+        "fill_palette_index": 5,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "blue",
+        "size_token": "l"
+      }
+    },
+    {
+      "glyph_id": "circle.violet.s",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 60000,
+        "fill_palette_index": 6,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "violet",
+        "size_token": "s"
+      }
+    },
+    {
+      "glyph_id": "circle.violet.m",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 90000,
+        "fill_palette_index": 6,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "violet",
+        "size_token": "m"
+      }
+    },
+    {
+      "glyph_id": "circle.violet.l",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 135000,
+        "fill_palette_index": 6,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "violet",
+        "size_token": "l"
+      }
+    },
+    {
+      "glyph_id": "circle.white.s",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 60000,
+        "fill_palette_index": 7,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "white",
+        "size_token": "s"
+      }
+    },
+    {
+      "glyph_id": "circle.white.m",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 90000,
+        "fill_palette_index": 7,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "white",
+        "size_token": "m"
+      }
+    },
+    {
+      "glyph_id": "circle.white.l",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 135000,
+        "fill_palette_index": 7,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "white",
+        "size_token": "l"
+      }
+    },
+    {
+      "glyph_id": "circle.gray.s",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 60000,
+        "fill_palette_index": 8,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "gray",
+        "size_token": "s"
+      }
+    },
+    {
+      "glyph_id": "circle.gray.m",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 90000,
+        "fill_palette_index": 8,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "gray",
+        "size_token": "m"
+      }
+    },
+    {
+      "glyph_id": "circle.gray.l",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 135000,
+        "fill_palette_index": 8,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "gray",
+        "size_token": "l"
+      }
+    },
+    {
+      "glyph_id": "circle.black.s",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 60000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "size_token": "s"
+      }
+    },
+    {
+      "glyph_id": "circle.black.m",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 90000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "size_token": "m"
+      }
+    },
+    {
+      "glyph_id": "circle.black.l",
+      "family": "colored_circle",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 135000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "size_token": "l"
+      }
+    },
+    {
+      "glyph_id": "dot.black.s",
+      "family": "black_dot",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 24000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "size_token": "s"
+      }
+    },
+    {
+      "glyph_id": "dot.black.m",
+      "family": "black_dot",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 36000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "size_token": "m"
+      }
+    },
+    {
+      "glyph_id": "dot.black.l",
+      "family": "black_dot",
+      "render": {
+        "primitive": "filled_circle",
+        "diameter_fp": 54000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "size_token": "l"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose000.s.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 0,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose000",
+        "length_token": "s",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose000.s.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 0,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose000",
+        "length_token": "s",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose000.s.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 0,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose000",
+        "length_token": "s",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose000.m.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 0,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose000",
+        "length_token": "m",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose000.m.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 0,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose000",
+        "length_token": "m",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose000.m.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 0,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose000",
+        "length_token": "m",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose000.l.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 0,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose000",
+        "length_token": "l",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose000.l.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 0,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose000",
+        "length_token": "l",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose000.l.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 0,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose000",
+        "length_token": "l",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose045.s.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 45000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose045",
+        "length_token": "s",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose045.s.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 45000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose045",
+        "length_token": "s",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose045.s.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 45000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose045",
+        "length_token": "s",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose045.m.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 45000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose045",
+        "length_token": "m",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose045.m.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 45000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose045",
+        "length_token": "m",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose045.m.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 45000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose045",
+        "length_token": "m",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose045.l.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 45000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose045",
+        "length_token": "l",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose045.l.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 45000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose045",
+        "length_token": "l",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose045.l.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 45000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose045",
+        "length_token": "l",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose090.s.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 90000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose090",
+        "length_token": "s",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose090.s.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 90000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose090",
+        "length_token": "s",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose090.s.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 90000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose090",
+        "length_token": "s",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose090.m.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 90000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose090",
+        "length_token": "m",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose090.m.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 90000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose090",
+        "length_token": "m",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose090.m.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 90000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose090",
+        "length_token": "m",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose090.l.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 90000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose090",
+        "length_token": "l",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose090.l.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 90000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose090",
+        "length_token": "l",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose090.l.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 90000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose090",
+        "length_token": "l",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose135.s.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 135000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose135",
+        "length_token": "s",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose135.s.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 135000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose135",
+        "length_token": "s",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose135.s.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 135000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose135",
+        "length_token": "s",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose135.m.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 135000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose135",
+        "length_token": "m",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose135.m.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 135000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose135",
+        "length_token": "m",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose135.m.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 135000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose135",
+        "length_token": "m",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose135.l.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 135000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose135",
+        "length_token": "l",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose135.l.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 135000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose135",
+        "length_token": "l",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose135.l.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 135000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose135",
+        "length_token": "l",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose180.s.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 180000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose180",
+        "length_token": "s",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose180.s.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 180000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose180",
+        "length_token": "s",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose180.s.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 180000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose180",
+        "length_token": "s",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose180.m.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 180000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose180",
+        "length_token": "m",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose180.m.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 180000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose180",
+        "length_token": "m",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose180.m.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 180000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose180",
+        "length_token": "m",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose180.l.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 180000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose180",
+        "length_token": "l",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose180.l.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 180000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose180",
+        "length_token": "l",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose180.l.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 180000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose180",
+        "length_token": "l",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose225.s.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 225000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose225",
+        "length_token": "s",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose225.s.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 225000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose225",
+        "length_token": "s",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose225.s.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 225000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose225",
+        "length_token": "s",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose225.m.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 225000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose225",
+        "length_token": "m",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose225.m.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 225000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose225",
+        "length_token": "m",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose225.m.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 225000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose225",
+        "length_token": "m",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose225.l.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 225000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose225",
+        "length_token": "l",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose225.l.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 225000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose225",
+        "length_token": "l",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose225.l.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 225000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose225",
+        "length_token": "l",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose270.s.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 270000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose270",
+        "length_token": "s",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose270.s.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 270000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose270",
+        "length_token": "s",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose270.s.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 270000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose270",
+        "length_token": "s",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose270.m.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 270000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose270",
+        "length_token": "m",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose270.m.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 270000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose270",
+        "length_token": "m",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose270.m.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 270000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose270",
+        "length_token": "m",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose270.l.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 270000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose270",
+        "length_token": "l",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose270.l.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 270000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose270",
+        "length_token": "l",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose270.l.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 270000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose270",
+        "length_token": "l",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose315.s.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 315000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose315",
+        "length_token": "s",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose315.s.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 315000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose315",
+        "length_token": "s",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose315.s.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 90000,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 315000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose315",
+        "length_token": "s",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose315.m.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 315000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose315",
+        "length_token": "m",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose315.m.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 315000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose315",
+        "length_token": "m",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose315.m.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 135000,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 315000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose315",
+        "length_token": "m",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose315.l.thin",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 9000,
+        "base_orientation_mdeg": 315000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose315",
+        "length_token": "l",
+        "thickness_token": "thin"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose315.l.normal",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 15000,
+        "base_orientation_mdeg": 315000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose315",
+        "length_token": "l",
+        "thickness_token": "normal"
+      }
+    },
+    {
+      "glyph_id": "stick.black.pose315.l.thick",
+      "family": "black_stick",
+      "render": {
+        "primitive": "capsule",
+        "length_fp": 202500,
+        "thickness_fp": 24000,
+        "base_orientation_mdeg": 315000,
+        "fill_palette_index": 9,
+        "stroke_palette_index": null,
+        "stroke_width_fp": 0
+      },
+      "semantics": {
+        "color_token": "black",
+        "pose_token": "pose315",
+        "length_token": "l",
+        "thickness_token": "thick"
+      }
+    },
+    {
+      "glyph_id": "outline.triangle",
+      "family": "black_outline",
+      "render": {
+        "primitive": "triangle",
+        "bbox_w_fp": 160000,
+        "bbox_h_fp": 160000,
+        "fill_palette_index": null,
+        "stroke_palette_index": 9,
+        "stroke_width_fp": 9000
+      },
+      "semantics": {
+        "color_token": "black",
+        "shape_token": "triangle"
+      }
+    },
+    {
+      "glyph_id": "outline.square",
+      "family": "black_outline",
+      "render": {
+        "primitive": "square",
+        "bbox_w_fp": 150000,
+        "bbox_h_fp": 150000,
+        "fill_palette_index": null,
+        "stroke_palette_index": 9,
+        "stroke_width_fp": 9000
+      },
+      "semantics": {
+        "color_token": "black",
+        "shape_token": "square"
+      }
+    },
+    {
+      "glyph_id": "outline.rectangle",
+      "family": "black_outline",
+      "render": {
+        "primitive": "rectangle",
+        "bbox_w_fp": 180000,
+        "bbox_h_fp": 120000,
+        "fill_palette_index": null,
+        "stroke_palette_index": 9,
+        "stroke_width_fp": 9000
+      },
+      "semantics": {
+        "color_token": "black",
+        "shape_token": "rectangle"
+      }
+    },
+    {
+      "glyph_id": "outline.diamond",
+      "family": "black_outline",
+      "render": {
+        "primitive": "diamond",
+        "bbox_w_fp": 150000,
+        "bbox_h_fp": 150000,
+        "fill_palette_index": null,
+        "stroke_palette_index": 9,
+        "stroke_width_fp": 9000
+      },
+      "semantics": {
+        "color_token": "black",
+        "shape_token": "diamond"
+      }
+    },
+    {
+      "glyph_id": "outline.circle",
+      "family": "black_outline",
+      "render": {
+        "primitive": "circle",
+        "bbox_w_fp": 150000,
+        "bbox_h_fp": 150000,
+        "fill_palette_index": null,
+        "stroke_palette_index": 9,
+        "stroke_width_fp": 9000
+      },
+      "semantics": {
+        "color_token": "black",
+        "shape_token": "circle"
+      }
+    },
+    {
+      "glyph_id": "outline.ellipse",
+      "family": "black_outline",
+      "render": {
+        "primitive": "ellipse",
+        "bbox_w_fp": 180000,
+        "bbox_h_fp": 120000,
+        "fill_palette_index": null,
+        "stroke_palette_index": 9,
+        "stroke_width_fp": 9000
+      },
+      "semantics": {
+        "color_token": "black",
+        "shape_token": "ellipse"
+      }
+    },
+    {
+      "glyph_id": "outline.cross",
+      "family": "black_outline",
+      "render": {
+        "primitive": "cross",
+        "bbox_w_fp": 150000,
+        "bbox_h_fp": 150000,
+        "fill_palette_index": null,
+        "stroke_palette_index": 9,
+        "stroke_width_fp": 9000
+      },
+      "semantics": {
+        "color_token": "black",
+        "shape_token": "cross"
+      }
+    },
+    {
+      "glyph_id": "outline.plus",
+      "family": "black_outline",
+      "render": {
+        "primitive": "plus",
+        "bbox_w_fp": 150000,
+        "bbox_h_fp": 150000,
+        "fill_palette_index": null,
+        "stroke_palette_index": 9,
+        "stroke_width_fp": 9000
+      },
+      "semantics": {
+        "color_token": "black",
+        "shape_token": "plus"
+      }
+    }
+  ],
+  "catalog_hash": "da2d3b72ff8d41abb8c293ce1deca44e99cb1d1a696e9834997395c6f6218005"
+}

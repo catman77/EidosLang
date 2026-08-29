@@ -1,0 +1,3 @@
+mnt/data/eidolang_android_r20_1/tools/r20-conformance/R20GoldenVerify.kt:36:9: warning: variable 'a1' is never used
+    val a1=JvmPrivateIdentity.fromEncoded(
+        ^

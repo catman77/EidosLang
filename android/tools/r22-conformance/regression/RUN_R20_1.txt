@@ -1,0 +1,14 @@
+PASS RFC5869 HKDF-SHA256 vector A.1
+PASS signed P-256 prekey bundle authentication
+PASS persistent prekey secret state round-trip before asynchronous use
+PASS asynchronous session bootstrap consumes one-time prekey exactly once
+PASS responder first send advances the DH/root ratchet
+PASS bounded skipped-message keys recover out-of-order ratchet packets
+PASS compromise of current ratchet state does not recover an erased historical message key
+PASS canonical secret-session state round-trip
+PASS restored ratchet state continues the same live session
+PASS failed AEAD decrypt rolls ratchet state back transactionally
+PASS initial ciphertext tamper fails sender signature before plaintext release
+SESSION_ID=b25661b25a02448537d1c63dc5d4d5dd29b80dca87c8eaa5159bcf1355a32e27
+FINAL_BOB_HEAD=5a156907af00c096413f67d561eeb6e014be81ad4243656a67a1531d14218f54
+ALL R20.1 FORWARD-SESSION CHECKS PASS

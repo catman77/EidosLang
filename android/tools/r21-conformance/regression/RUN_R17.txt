@@ -1,0 +1,6 @@
+PASS node A seeds immutable segment and publishes mutable head
+PASS node B fetch -> R16 cryptographic admission
+PASS mutable head rejects non-monotonic sequence
+PASS transport success does not bypass corrupted-segment rejection
+PASS malformed mutable-head bytes rejected
+ALL R17 REFERENCE-TRANSPORT ADMISSION CHECKS PASS

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EidoVaultRollbackAnchorV1",
+  "type": "object",
+  "required": [
+    "anchor_id",
+    "body"
+  ],
+  "additionalProperties": false
+}

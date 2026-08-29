@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EidoMultiDeviceRecoveryCapsuleV1",
+  "type": "object",
+  "required": [
+    "body",
+    "capsule_id"
+  ],
+  "additionalProperties": false
+}

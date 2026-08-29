@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EidoInitialSessionPacketV1",
+  "type": "object",
+  "required": [
+    "body",
+    "packet_id",
+    "sender_signature_b64"
+  ],
+  "additionalProperties": false
+}

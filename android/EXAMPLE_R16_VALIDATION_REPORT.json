@@ -1,0 +1,80 @@
+{
+  "stage": "R16",
+  "status": "ARCHIVE_PROTOCOL_IMPLEMENTED_FIXED_GOLDEN_AND_INDEPENDENT_CROSSCHECK_PASS",
+  "profile": {
+    "torrent": "BitTorrent v2 / BEP52",
+    "piece_length": 16384,
+    "head": "BEP44 mutable item",
+    "head_value_max_bytes": 1000
+  },
+  "fixed_golden": {
+    "conversation_id": "47309d0261530f511489bcf5108a3a0f1bdc59fa88015aa7c84ece864d3959e3",
+    "segment_id": "78aa678b7004e0acb800bcc0732d39c41028db776da51cbc0018e22e8af0d25b",
+    "torrent_infohash_v2": "d53c6a8c2d521374d8cf38d025b5dfa273c59b3df75d44f26d7a495340d45129",
+    "head_message_id": "74bfbcace354b2864708ab9c014e2150a0583a733d2c9e62facda6a92523fa1b",
+    "bep44_target": "06ed00b9aa03a6f26a30069a823c115d1f1792ca",
+    "bep44_seq": "1",
+    "publisher_key_id": "dht:94d7ef94840599c6be1935fc6715e83b856b8ca1d8ed720601844e6b0ad8ff9b"
+  },
+  "checks": {
+    "r16_dynamic_final": [
+      "PASS immutable segment build + message DAG head derivation",
+      "PASS deterministic segment/torrent independent of input ordering",
+      "PASS BEP52 v2 metainfo + btmh magnet + piece layers",
+      "PASS downloaded-file reconstruction and cryptographic verification",
+      "PASS archive file tamper rejection",
+      "PASS torrent path traversal rejection",
+      "PASS R15-device-signed BEP44 publisher-key binding",
+      "PASS BEP44 mutable head signature/target/value budget",
+      "PASS BEP44 sequence tamper requires new signature",
+      "PASS same publisher+conversation yields stable DHT target with monotonic seq"
+    ],
+    "r16_fixed_golden": [
+      "PASS R16 fixed segment canonical reconstruction",
+      "PASS R16 fixed BEP52 metainfo/infohash reconstruction",
+      "PASS R16 fixed publisher certificate binding",
+      "PASS R16 fixed BEP44 mutable-head signature/target",
+      "PASS R16 fixed btmh magnet"
+    ],
+    "python_bep52": [
+      "PASS independent Python BEP52 infohash",
+      "PASS independent Python BEP52 metainfo byte equality"
+    ],
+    "python_bep44": [
+      "PASS independent Python BEP44 Ed25519 signature",
+      "PASS independent Python BEP44 target SHA1(k||salt)",
+      "PASS independent Python BEP44 value <=1000 bytes"
+    ],
+    "r15_regression": [
+      "PASS R15 fixed golden public identity validation",
+      "PASS R15 fixed golden message signature verification",
+      "PASS R15 fixed golden RSA-OAEP/AES-GCM decryption for Bob",
+      "PASS R15 fixed golden sender self-decryption",
+      "PASS R15 fixed golden document hash/snapshot recovery",
+      "PASS R15 fixed golden signature tamper rejection",
+      "PASS R15 fixed golden conversation-binding rejection"
+    ],
+    "r14_1_regression": [
+      "PASS 00_empty content=2fab39fd5d0ff713f059c39b67878cbb7aad2bc6cc50107247e160bb74ad2d10 snapshot=bc3457aa472a1be801c5152e4ee2b58ee96ebf37cb184a6c06e75ee32d9e7e4d",
+      "PASS 01_red_circle content=41e46a7b1b69fd012cc21ed9020fb1119ee00c33dfcc9924a684a788577b099b snapshot=e4fa9396a0bee8e4d7c42db0d2e3ec2800e115bc183b32f35f27692c678d4522",
+      "PASS 02_stick_dot_outline content=f43ad42268e705559ff6b5c819059edc870e63e79ac21e3f28143a4e57fc7aee snapshot=2043b5415d0d47dc7466976be94caaf0d3654a1685daa984c671304e954cb7fd",
+      "PASS 03_red_circle_direct content=41e46a7b1b69fd012cc21ed9020fb1119ee00c33dfcc9924a684a788577b099b snapshot=e4fa9396a0bee8e4d7c42db0d2e3ec2800e115bc183b32f35f27692c678d4522",
+      "PASS 04_red_circle_via_blue content=32d054bedc25a6dbdafa802755430b00395716ee86858fa61e99f28dfc5ff76c snapshot=e4fa9396a0bee8e4d7c42db0d2e3ec2800e115bc183b32f35f27692c678d4522",
+      "PASS 05_group_transform content=3f2a90a488296b1ed1e9bba3db9a0637694dfc3788ef8a3b9577a0ef9564ab26 snapshot=deb1741d37e9f858d0061af11d0f588e7ab607bf4baf67a149a81586b2060716",
+      "PASS editor reducer undo/redo",
+      "PASS strict canonical parser round-trip",
+      "PASS non-canonical import rejection",
+      "PASS duplicate-key and lineage rejection",
+      "PASS geometry-aware hit testing",
+      "PASS grouped selection semantics",
+      "PASS draft restore counters"
+    ]
+  },
+  "network": {
+    "actual_dht_put_get": false,
+    "actual_swarm_transfer": false,
+    "android_native_build": false
+  },
+  "next_stage": "R17 Android P2P/Torrent Engine",
+  "targeted_pass_count": 40
+}

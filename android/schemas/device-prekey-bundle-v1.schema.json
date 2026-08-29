@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EidoDevicePreKeyBundleV1",
+  "type": "object",
+  "required": [
+    "body",
+    "bundle_id",
+    "device_signature_b64"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,10 @@
+#!/bin/sh
+set -eu
+APP_HOME=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+JAR="$APP_HOME/gradle/wrapper/gradle-wrapper.jar"
+if [ ! -f "$JAR" ]; then
+  echo "gradle-wrapper.jar is not vendored in this source archive." >&2
+  echo "Open the project in Android Studio, or run: gradle wrapper --gradle-version 9.5.0" >&2
+  exit 2
+fi
+exec java -classpath "$JAR" org.gradle.wrapper.GradleWrapperMain "$@"

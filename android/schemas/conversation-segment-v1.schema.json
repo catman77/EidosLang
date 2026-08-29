@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ConversationSegmentV1",
+  "type": "object",
+  "required": [
+    "body",
+    "segment_id"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "segment_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "body": {
+      "type": "object"
+    }
+  }
+}

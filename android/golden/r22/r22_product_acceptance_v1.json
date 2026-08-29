@@ -1,0 +1,20 @@
+{
+  "manifest_type": "EidoLangR22ProductAcceptanceV1",
+  "wire_protocol_change": false,
+  "app_version": "0.1-R22",
+  "required_fixed_inputs": {
+    "r20_2_history_vault_golden_sha256": "b1ce569e770200806a003ae867d90096d9720f0240aed015db96ae49951fb0b8",
+    "r21_hardening_golden_sha256": "8088b67350694162f6851b3f0e8a19a382804fb3148ad6ef8d8f25f9d0735350"
+  },
+  "required_android_source_boundaries": [
+    "explicit primary-vs-secondary first-run choice",
+    "root-authorized secondary enrollment + roster import",
+    "R20.2 secure vault export/restore",
+    "R21 encrypted recovery backup + separate code",
+    "FRESHNESS UNPROVEN confirmation on fresh offline restore",
+    "R19 migrate→recover→compare cutover",
+    "SQLite v3 protected contact aliases/conversation titles",
+    "Android runtime admission probe"
+  ],
+  "network_execution_required_for_r22": false
+}

@@ -1,0 +1,15 @@
+PASS explicit epoch-0 device rosters replace implicit first-run active state
+PASS primary installation creates an ordinary signed/encrypted message before secondary enrollment
+PASS secondary onboarding possession proof + root certificate + roster activation
+PASS product secure export separates encrypted vault package, encrypted recovery backup and recovery code
+PASS secondary destructive restore works with vault backup/code and no historical RSA/key-grant dependency
+PASS fresh restore labels freshness honestly and local checkpoint rejects later rollback
+PASS restored secondary continues the same immutable MessageId DAG
+PASS device revocation forces fresh vault epoch with only currently active secondary
+PASS post-revocation history is archived only under the fresh active-device epoch
+PASS verified migrate?recover?compare cutover blocks exact retired legacy artifact
+PASS product recovery path rejects mismatched recovery code
+FINAL_PACKAGE_ID=76752bcdd1ae3865016b7349a711519f2b9d94b71439a8e5afe1001ca02c4275
+FINAL_HEAD=45561d17797dfdf411dbdddad7f9e849c086d82c9f399864d7c147f67cbd5eb1
+CUTOVER_ID=cd80c4aa347997f3e47627ae7132033d144488eb9395b8bbc958f875c34a6ed9
+ALL R22 PRODUCT-JOURNEY CHECKS PASS

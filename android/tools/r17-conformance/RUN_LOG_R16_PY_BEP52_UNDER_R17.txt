@@ -1,0 +1,3 @@
+PASS independent Python BEP52 infohash
+PASS independent Python BEP52 metainfo byte equality
+INFOHASH=d53c6a8c2d521374d8cf38d025b5dfa273c59b3df75d44f26d7a495340d45129

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Cleartext stays forbidden everywhere, as R22 requires. The relay is reached over TLS with a
+  self-signed certificate trusted for that one host only, which is narrower than adding a cleartext
+  exception and narrower than trusting a public CA for it.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="false">45.144.54.36</domain>
+        <trust-anchors>
+            <certificates src="@raw/eidolang_relay" />
+        </trust-anchors>
+    </domain-config>
+</network-security-config>

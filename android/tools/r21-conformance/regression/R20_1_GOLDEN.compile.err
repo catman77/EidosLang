@@ -1,0 +1,3 @@
+mnt/data/eidolang_android_r21/tools/r20_1-conformance/R20_1GoldenVerify.kt:14:9: warning: variable 'conversation' is never used
+    val conversation=ConversationParser.parseCanonical(GoldenR20_1.CONVERSATION)
+        ^

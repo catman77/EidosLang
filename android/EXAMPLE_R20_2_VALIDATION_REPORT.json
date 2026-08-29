@@ -1,0 +1,93 @@
+{
+  "stage": "R20.2",
+  "status": "FORWARD_SECURE_HISTORY_VAULT_CORE_COMPLETE",
+  "necessity_source": "R20.1 archive no-go: erased session keys + destructive recovery require an independent recovery domain",
+  "new_module": "core-vault",
+  "new_public_objects": [
+    "EidoHistoryVaultV1",
+    "EidoHistoryVaultEpochV1",
+    "EidoHistoryVaultEntryV1",
+    "EidoHistoryVaultDeviceGrantV1",
+    "EidoHistoryVaultArchivePackageV1"
+  ],
+  "secret_object": {
+    "name": "HistoryVaultRecoverySecret",
+    "bytes": 32,
+    "public_archive_member": false,
+    "raw_export_status": "TEST_ADMIN_ONLY"
+  },
+  "security_invariants": {
+    "active_session_state_independent_from_history_recovery_secret": true,
+    "random_independent_epoch_keys": true,
+    "history_entry_payload_encrypts_r15_envelope_and_document": true,
+    "new_device_recovery_without_old_r15_rsa_private_key": true,
+    "new_device_recovery_without_r20_message_key_grants": true,
+    "wrong_recovery_secret_zero_repository_mutation": true,
+    "package_identity_excludes_randomized_exporter_signature": true,
+    "revocation_is_prospective_via_new_random_epoch": true,
+    "legacy_cutover_requires_deletion_of_r16_r19_copies": true
+  },
+  "claim_boundary": {
+    "recovery_secret_compromise_reveals_vault_history": true,
+    "undeleted_legacy_archive_remains_legacy_rsa_exposure": true,
+    "metadata_anonymity_claimed": false,
+    "java_heap_physical_zeroization_claimed": false,
+    "post_quantum_claimed": false,
+    "consumer_ready_raw_recovery_secret_export_claimed": false
+  },
+  "golden": {
+    "sha256": "b1ce569e770200806a003ae867d90096d9720f0240aed015db96ae49951fb0b8",
+    "expected": {
+      "message_id": "2aab690c34dbfaaa8e08760f3eb04884e57eaed7b79975482db5ed2e780af09d",
+      "document_content_hash": "ebb9df3b6a5ed5f27458441ed83dbbb8d35b3d7e956daca47d6af4131e8e1f8a",
+      "vault_id": "6e44acc0af3b2b56ac4a5e89914f6cb69b6855a4d597bf02c4eca8715aaed03e",
+      "epoch_id": "94b4278a33f9e68a066e876653d2fe9c39fb5761006d16240ac5f0d1c059f34c",
+      "entry_id": "bf166a5ea85a786b323533a9f7bddd0c244f5d64a4304320d8e3ecb3d6fa08c4",
+      "package_id": "b013b6f44897f8253b6360df88ba252cdec897f40351aad1802f82a824d0d3d5"
+    }
+  },
+  "executed_pass_counts": {
+    "r20_2_dynamic": 12,
+    "r20_2_fixed_golden": 6,
+    "r20_2_independent_python": 3,
+    "r20_1_dynamic": 11,
+    "r20_1_fixed_golden": 6,
+    "r20_1_independent_python": 3,
+    "r20_multi_device": 11,
+    "r20_cross_device_recovery": 9,
+    "r20_fixed_golden": 6,
+    "r19_dynamic": 12,
+    "r19_fixed_package": 3,
+    "r18": 14,
+    "r17_reference": 5,
+    "r16_fixed": 5,
+    "r16_python_bep52": 2,
+    "r16_python_bep44": 3,
+    "r15_fixed": 7,
+    "r14_1": 13
+  },
+  "prior_regression_subtotal": 110,
+  "r20_2_additions": 21,
+  "total_pass_lines": 131,
+  "android_runtime": {
+    "gradle_build_executed": false,
+    "android_keystore_history_vault_runtime_executed": false,
+    "real_network_executed": false
+  },
+  "next_stage": "R21 Security / Fuzzing / Local Hardening",
+  "source_sha256": {
+    "core-vault/src/main/java/org/eidolang/core/vault/VaultModel.kt": "44eb90f7560eca19aed69a2ad51ad7357bfed5053fcce6ce0e9c7f29d2920761",
+    "core-vault/src/main/java/org/eidolang/core/vault/VaultCodec.kt": "a33d134dc11f4b5d88bf6d307e21504cc7cacce888c47cd032fdb8e801366885",
+    "core-vault/src/main/java/org/eidolang/core/vault/VaultCrypto.kt": "57aed4e2d1bfd9b3836a751e6fdb1032798813737fb54e24b641965fb78c7691",
+    "core-vault/src/main/java/org/eidolang/core/vault/VaultGrantParser.kt": "ef221e3557ffef4a347d21d08d7d61dbdfa6b879ba1ad9878b4306e6b8ba87ab",
+    "core-vault/src/main/java/org/eidolang/core/vault/VaultArchive.kt": "5c69d16799ac32fd898803966ae84e170d2a21f61c2fd84cdd026d7261c9f7d9",
+    "core-vault/src/main/java/org/eidolang/core/vault/VaultRecovery.kt": "81b20a46159f4c877fa0905236f7ef8fd74183164afca337404e4d0fb08ff7ba",
+    "core-vault/src/main/java/org/eidolang/core/vault/LegacyMigration.kt": "83494bc928bec7a748f57f72525429def9a3519f3bed3097b9e723a14fd177a5",
+    "core-vault/src/main/java/org/eidolang/core/vault/AndroidHistoryVaultSecretStore.kt": "b69ecaf576909d0a8c8221d8acbcb9ebeb568ba135b334c52f376e65f82d1a13",
+    "core-repository/src/main/java/org/eidolang/core/repository/RepositoryModel.kt": "d3ae89b2a6a6da55d1be2e778451d21cfdc566dcbafefe2a48086c7c2493ddc2",
+    "core-repository/src/main/java/org/eidolang/core/repository/MessengerService.kt": "e31f6354bbe7b99550cd3294b54dd7a3af8b85cdac31cf36ffb6a3f77bf80dd7",
+    "R20_2_METHODOLOGY.md": "0e5331bfe1251cbce8bdbe24fd6e7e56658a6a385ef9129b5fff24c7653d2f0a",
+    "R20_2_SECURITY_MODEL.md": "fff834d5041914abbc21ce31bea21a8c3f6ef5aaf783afb00277a375b33f0607",
+    "R20_2_ARCHIVE_MIGRATION.md": "5c7ba17d454728cbad2e69100870894537c329b0b6f1ecec75e5fcbd4c5928f5"
+  }
+}

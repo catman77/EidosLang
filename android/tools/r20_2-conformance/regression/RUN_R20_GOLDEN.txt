@@ -1,0 +1,7 @@
+PASS fixed R20 identity bundles
+PASS fixed R20 enrollment possession proof
+PASS fixed R20 root-signed roster chain
+PASS fixed R20 historical grant decrypts legacy message
+PASS fixed R20 cross-device recovery capsule
+PASS fixed R20 key-grant target tamper rejection
+ALL R20 FIXED GOLDEN CHECKS PASS

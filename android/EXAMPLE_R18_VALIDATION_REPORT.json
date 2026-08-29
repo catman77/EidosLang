@@ -1,0 +1,68 @@
+{
+  "stage": "R18",
+  "status": "SOURCE_COMPLETE_PURE_KOTLIN_MESSENGER_REPOSITORY_PASS",
+  "network_execution_required_for_stage": false,
+  "modules_added": [
+    "core-repository",
+    "feature-viewer",
+    "feature-messenger"
+  ],
+  "app_root": "EidoMessengerApp",
+  "repository": {
+    "android_database": "eidolang-messenger-r18.db",
+    "stores_plaintext_eidogram_documents_in_messages_table": false,
+    "message_unique_keys": [
+      "message_id",
+      "(conversation_id,sender_device_id,sender_seq)"
+    ],
+    "out_of_order_sender_seq_allowed": true,
+    "equivocation_same_sender_seq_rejected": true
+  },
+  "ux_flows": [
+    "export local public identity",
+    "import contact",
+    "create conversation",
+    "export/import conversation descriptor",
+    "compose eidogram message",
+    "local encrypted signed send",
+    "export outgoing envelope",
+    "import incoming envelope",
+    "render decrypted timeline"
+  ],
+  "r15_identity_stability_correction": {
+    "identity_key": "(user_id, device_id)",
+    "ecdsa_root_signature_treated_as_proof_not_identity": true,
+    "android_cached_verified_certificate_signature": true
+  },
+  "executed_pass_counts": {
+    "r18": 14,
+    "r17": 5,
+    "r16_golden": 5,
+    "r16_py_bep52": 2,
+    "r16_py_bep44": 3,
+    "r15": 7,
+    "r14_1": 13
+  },
+  "executed_pass_total": 49,
+  "android_runtime": {
+    "gradle_build_executed": false,
+    "sqlite_instrumentation_executed": false,
+    "keystore_runtime_executed": false,
+    "compose_instrumentation_executed": false,
+    "reason": "Android SDK/emulator unavailable in artifact environment"
+  },
+  "next_stage": "R19 Archive / Recovery and local R16 segment integration",
+  "source_sha256": {
+    "core-repository/src/main/java/org/eidolang/core/repository/RepositoryModel.kt": "08038d4d229aaf970e0560cc9061c5d3060d9866f68d748be753105de000e3c1",
+    "core-repository/src/main/java/org/eidolang/core/repository/InMemoryMessengerRepository.kt": "7c930e29e97e76c9d3ced07639b330fd8bbbe9ee3cf0effc9b29638989995ed5",
+    "core-repository/src/main/java/org/eidolang/core/repository/MessengerService.kt": "452dc7f64b6811562e455d11af5a5f7130769ef412ba326569d133e563a06c7c",
+    "core-repository/src/main/java/org/eidolang/core/repository/AndroidSqliteMessengerRepository.kt": "ba4faa1d5f20871e71faa2d7d6db26956383497eb8ee2810b3b36bc8a09eae69",
+    "feature-messenger/src/main/java/org/eidolang/feature/messenger/EidoMessengerApp.kt": "c45720e3547ab02a5bb4c9aa2e51725f18ee75a71c6cfbbe348f27d0c2962dfe",
+    "feature-viewer/src/main/java/org/eidolang/feature/viewer/EidogramViewer.kt": "c217da05c6c4978261d6c080e3f5c58b9d0e6504c2c026b1d169f55051243e71",
+    "feature-editor/src/main/java/org/eidolang/feature/editor/EidoEditorScreen.kt": "db4d290bb5d0ac4e0edf46acbae60a3af2ebf952e89a537a72c0461ca9830e72",
+    "feature-editor/src/main/java/org/eidolang/feature/editor/DraftStore.kt": "fcc4d7eebb67bff95a08ac9d3a20cb70600285979f03395a4daa1149d2aeae9f",
+    "core-crypto/src/main/java/org/eidolang/core/crypto/AndroidKeystoreIdentityStore.kt": "1ed6e41ffe409b0d39c8676b3ac313799f996f1d87522b0ac326eccdf05a3238",
+    "app/src/main/java/org/eidolang/app/MainActivity.kt": "9d8284ac619db8e091a78575dd5cc4491eedb4eee200ac3d9520b02a10a5d41c",
+    "tools/r18-conformance/R18Main.kt": "5bcff78b973e33324c4885cc605bc8b5b78c030a32a72d86c1b42fea75fea7e9"
+  }
+}

@@ -1,0 +1,6 @@
+PASS R16 fixed segment canonical reconstruction
+PASS R16 fixed BEP52 metainfo/infohash reconstruction
+PASS R16 fixed publisher certificate binding
+PASS R16 fixed BEP44 mutable-head signature/target
+PASS R16 fixed btmh magnet
+ALL R16 FIXED GOLDEN CHECKS PASS

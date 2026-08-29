@@ -1,0 +1,16 @@
+PASS legacy messages exist before secondary-device authorization
+PASS control: legacy R19 package exposes recoverable canonical R15 envelope bytes
+PASS R19 migration removes raw R15 envelope/key-box material from the new archive surface
+PASS compromise of current R20.1 ratchet state cannot open the independent history vault
+PASS destructive recovery on a new authorized device needs neither old RSA private key nor R20 message-key grants
+PASS recovered secondary device continues the same MessageId DAG
+PASS package identity excludes randomized exporter proof and incremental archive adds only fresh history
+PASS vault epoch rotation excludes revoked devices while preserving active-device access
+PASS post-revocation history is sealed only under the fresh vault epoch
+PASS independent recovery secret reconstructs a multi-epoch history after old session keys are erased
+PASS wrong recovery secret causes zero repository mutation
+PASS archive metadata/body tamper rejected by package identity/signature
+VAULT_ID=875bc2681ec159ed393a2649747dd0ef8446f4fc72dd43b2902c143d72e9f8f8
+FINAL_VAULT_PACKAGE_ID=e0b2998cc2a6810ebeea5872eac2cbc70bc09c7e23b004f27e25df525145d0a0
+FINAL_HEAD=721399bb97471317a363fa76b448891b9d6d9f0c1e08622dc5112b72c5f4bace
+ALL R20.2 HISTORY-VAULT CHECKS PASS

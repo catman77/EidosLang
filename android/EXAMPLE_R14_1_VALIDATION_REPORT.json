@@ -1,0 +1,47 @@
+{
+  "stage": "R14.1",
+  "status": "SOURCE_COMPLETE_PURE_KOTLIN_CONFORMANCE_PASS",
+  "wire_format_changed": false,
+  "glyph_catalog_count": 113,
+  "catalog_hash": "da2d3b72ff8d41abb8c293ce1deca44e99cb1d1a696e9834997395c6f6218005",
+  "implemented": [
+    "geometry-aware hit testing",
+    "group-aware selection",
+    "multi-select UI",
+    "group/ungroup UI",
+    "strict canonical parser",
+    "canonical import/export",
+    "internal draft persistence",
+    "deterministic counter restore",
+    "Android instrumentation smoke-test source"
+  ],
+  "pure_kotlin_checks_passed": [
+    "PASS 00_empty content=2fab39fd5d0ff713f059c39b67878cbb7aad2bc6cc50107247e160bb74ad2d10 snapshot=bc3457aa472a1be801c5152e4ee2b58ee96ebf37cb184a6c06e75ee32d9e7e4d",
+    "PASS 01_red_circle content=41e46a7b1b69fd012cc21ed9020fb1119ee00c33dfcc9924a684a788577b099b snapshot=e4fa9396a0bee8e4d7c42db0d2e3ec2800e115bc183b32f35f27692c678d4522",
+    "PASS 02_stick_dot_outline content=f43ad42268e705559ff6b5c819059edc870e63e79ac21e3f28143a4e57fc7aee snapshot=2043b5415d0d47dc7466976be94caaf0d3654a1685daa984c671304e954cb7fd",
+    "PASS 03_red_circle_direct content=41e46a7b1b69fd012cc21ed9020fb1119ee00c33dfcc9924a684a788577b099b snapshot=e4fa9396a0bee8e4d7c42db0d2e3ec2800e115bc183b32f35f27692c678d4522",
+    "PASS 04_red_circle_via_blue content=32d054bedc25a6dbdafa802755430b00395716ee86858fa61e99f28dfc5ff76c snapshot=e4fa9396a0bee8e4d7c42db0d2e3ec2800e115bc183b32f35f27692c678d4522",
+    "PASS 05_group_transform content=3f2a90a488296b1ed1e9bba3db9a0637694dfc3788ef8a3b9577a0ef9564ab26 snapshot=deb1741d37e9f858d0061af11d0f588e7ab607bf4baf67a149a81586b2060716",
+    "PASS editor reducer undo/redo",
+    "PASS strict canonical parser round-trip",
+    "PASS non-canonical import rejection",
+    "PASS duplicate-key and lineage rejection",
+    "PASS geometry-aware hit testing",
+    "PASS grouped selection semantics",
+    "PASS draft restore counters"
+  ],
+  "android_build_executed": false,
+  "android_build_blocker": "Android SDK and Gradle are not installed in artifact environment",
+  "next_stage": "R15 Identity + Message Envelope",
+  "source_sha256": {
+    "core-model/src/main/java/org/eidolang/core/model/EidogramHitTest.kt": "56879dec49f683609a2b2a846a8f1254a98f6b9ea088a8c97974e7da562967a9",
+    "core-model/src/main/java/org/eidolang/core/model/EditorEngine.kt": "6f521e11667a37a093133aa3043eacb64a72d2c87ac13424a9fca15188b24782",
+    "core-canonical/src/main/java/org/eidolang/core/canonical/StrictJson.kt": "c81b94944400672a49cb30e8c9a52d892aa669ca2ff220e469965f8cd50f83ce",
+    "core-canonical/src/main/java/org/eidolang/core/canonical/EidogramParser.kt": "d0de8d41a322222bd538b61d4410db0e5a19f8f73256a5d0d26f20dce90827db",
+    "feature-editor/src/main/java/org/eidolang/feature/editor/DraftStore.kt": "f02b32532d02925603239347a9ef1b74ba66e4d84631c721a66c833a54e2e876",
+    "feature-editor/src/main/java/org/eidolang/feature/editor/EidoEditorScreen.kt": "e512e253d9134e5d17a4f61e7ece51ecb34cfd748c4cb71dd8e69375956d9200",
+    "app/src/androidTest/java/org/eidolang/app/EditorSmokeTest.kt": "8744428f8d65b067f96fe4cac29df65d3947b8af027e463bbead59157dda628f",
+    "tools/kotlin-conformance/Main.kt": "147971939f3239f460b88ff630a7eeabd0858e150782a9f912b1f35b920df255",
+    "tools/kotlin-conformance/RUN_LOG_R14_1.txt": "3706925b4bab44f9e7dd97ac547b552ac9641ada8858e367fd725fe0cdd1bb12"
+  }
+}

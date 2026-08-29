@@ -1,0 +1,36 @@
+[versions]
+agp = "9.3.0"
+kotlin = "2.3.21"
+composeBom = "2026.06.00"
+activityCompose = "1.13.0"
+lifecycle = "2.10.0"
+junit = "4.13.2"
+work = "2.11.2"
+zxing = "3.5.3"
+coreKtx = "1.19.0"
+
+[libraries]
+androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+androidx-compose-ui = { module = "androidx.compose.ui:ui" }
+androidx-compose-foundation = { module = "androidx.compose.foundation:foundation" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
+androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
+androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+junit = { module = "junit:junit", version.ref = "junit" }
+androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "work" }
+# Pure Java, no transitive dependencies and no Android or network surface: only the QR encoder is
+# used, to draw an invite link the other phone's own camera app can read.
+zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
+# FileProvider, so a share sheet can be handed a QR image or an exported chat without ever
+# exposing the app's private files directory.
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

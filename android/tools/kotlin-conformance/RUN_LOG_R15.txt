@@ -1,0 +1,19 @@
+PASS identity root/device certificate verification
+PASS canonical public identity bundle round-trip
+PASS canonical conversation descriptor round-trip
+PASS signed encrypted message authentication
+PASS canonical message envelope round-trip
+PASS recipient and sender decrypt exact canonical eidogram
+PASS ciphertext tamper rejected by signed body hash/signature
+PASS metadata tamper rejected
+PASS cross-conversation replay binding
+PASS non-canonical message rejected
+PASS wrong private key cannot unwrap recipient key
+MESSAGE_ID=e2b6bb8b27978be7c0d8393353cbbe8eb396b70b7882db6adaec4e0aba09f7ff
+CONVERSATION_ID=bb27b7908b6e271c3f7d1c03215fb9828788986c0eae35942a9b630ad9713cd8
+ALICE_USER_ID=9ef97f30c10bf695d1feb5653ae681052e8f78212ffa53236bc0358fa88eefcc
+ALICE_DEVICE_ID=dev:03991f924db84cc081d42ceb3836e6437484c675b06bca360332da9d7bb9e00b
+BOB_USER_ID=d1c236a204634f637f8690b9dd7e9660163c62be82b12b9aa0822905923ce11d
+BOB_DEVICE_ID=dev:b60b191c8066bd653d40f680c282c31c2436957fd2d6b1355b10e825c0c662f2
+PLAINTEXT_CONTENT_HASH=19c3dff240c8fc4403170a115f4f0bca99bef50557f469c3971631f24d7fbe37
+ALL R15 PURE-KOTLIN/JCA CONFORMANCE CHECKS PASS

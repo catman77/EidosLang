@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The launcher icon: an eidogram, not a picture of one.
+
+  `EidoLang_v1.md` is explicit that an eidogram is a trajectory Γ = (E_0 → … → E_n) through states,
+  not an image, and that assigning a meaning to a shape ("red = force") collapses eidography into
+  pictography. So the icon shows the one thing that is structural rather than semantic: a path
+  running through glyphs, with its start and end marked. The glyphs on it are taken from the frozen
+  catalogue's own palette and forms — a filled circle, a filled triangle, a stroke — and stand for
+  nothing in particular.
+
+  108x108 viewport; everything is kept inside the central safe zone (24..84) so no launcher mask
+  clips it.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- The trajectory. -->
+    <path
+        android:pathData="M31,77 L77,33"
+        android:strokeColor="#000000"
+        android:strokeWidth="5"
+        android:strokeLineCap="round" />
+
+    <!-- E_0 -->
+    <path
+        android:pathData="M31,77 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"
+        android:fillColor="#000000" />
+
+    <!-- A state on the way: catalogue circle, cyan. -->
+    <path
+        android:pathData="M38,43 m-13,0 a13,13 0 1,0 26,0 a13,13 0 1,0 -26,0"
+        android:fillColor="#00ACC1" />
+
+    <!-- A state on the way: catalogue triangle, red. -->
+    <path
+        android:pathData="M70,51 L82,76 L58,76 Z"
+        android:fillColor="#E53935" />
+
+    <!-- E_n -->
+    <path
+        android:pathData="M77,33 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"
+        android:fillColor="#000000" />
+</vector>

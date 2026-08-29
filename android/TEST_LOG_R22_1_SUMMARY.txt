@@ -1,0 +1,55 @@
+R22.1 executed test summary
+===========================
+
+PURE HOST CONFORMANCE (kotlinc 2.3.10 / JBR 21, 52 pure core sources)
+R22 product journey                          : 11 PASS
+R22 fixed cross-stage composition            :  5 PASS
+R22 Android source audit                     : 13 PASS
+Independent Python BEP52                     :  2 PASS
+Independent Python BEP44                     :  3 PASS
+Independent Python R20.1 forward session     :  3 PASS
+Independent Python R20.2 history vault       :  3 PASS
+Independent Python R21 hardening             :  3 PASS
+---------------------------------------------------------
+subtotal                                     : 43 PASS
+
+REAL BITTORRENT ON HOST (libtorrent-rasterbar 2.1.0, loopback only)
+Real swarm transfer                          :  6 PASS
+Admission over transferred bytes             :  4 PASS
+Real BEP44 DHT round trip                    :  6 PASS
+---------------------------------------------------------
+subtotal                                     : 16 PASS
+
+ANDROID INSTRUMENTATION (SM-G996N, Android 15 / SDK 35, arm64-v8a)
+AndroidAdmissionTest                         :  1 test
+KeystoreSecurityLevelTest                    :  1 test
+SqliteV3MigrationTest                        :  4 tests
+LibtorrentOnDeviceTest                       :  1 test
+DhtOnDeviceTest                              :  1 test
+TransportInterfaceOnDeviceTest               :  3 tests
+MessengerSmokeTest                           :  2 tests  (need device awake + unlocked)
+---------------------------------------------------------
+subtotal                                     : 13 tests
+
+Executed as two invocations (see R22_1_VALIDATION.md):
+  default suite (gradle connectedDebugAndroidTest) : OK (8 tests)
+  @NativeSessionHeavy (am instrument -e annotation): OK (5 tests)
+Single-suite execution is not supported: libtorrent sessions do not release in time for the
+Compose UI tests that sort after them, and the run dies at 6 of 13.
+
+TWO-DEVICE (phone <-> android-34 emulator)
+Enrollment + history-vault transfer          :  6 steps PASS
+Message delivery over BitTorrent             :  3 steps PASS (payload over the wire)
+
+NATIVE-HEAVY SUITE ON BOTH DEVICES
+SM-G996N (API 35)                            : OK (5 tests)
+emulator android-34                          : OK (5 tests)  [impossible before the Ed25519 fix]
+
+NOT RUN
+R14.1-R21 dynamic regression on this tree    : NOT RUN (R22 reports 151; inherited, not reproduced)
+Project's own eidolang_torrent JNI           : NOT RUN
+Pinned libtorrent 2.1.1 build                : NOT RUN
+R17.1 item 8 session/DHT state save-restore  : NOT RUN
+R17.1 item 9 process restart / WorkManager   : NOT RUN
+UI-driven transport flow                     : NOT RUN (no screen calls TorrentTransport)
+Public internet swarm or DHT                 : NOT RUN / intentionally excluded

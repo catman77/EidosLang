@@ -1,0 +1,6 @@
+PASS fixed R22 composes the exact R20.2 vault identity with the R21 backup domain
+PASS fixed R22 recovery backup/code opens the exact R20.2 recovery-key identity
+PASS fixed R22 product recovery pair decrypts the canonical archived eidogram history
+PASS fixed R22 rollback anchor binds the exact package/message/entry checkpoint
+PASS fixed R22 exact current package is idempotently admitted against its stored checkpoint
+ALL R22 FIXED PRODUCT CHECKS PASS

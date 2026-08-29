@@ -1,0 +1,14 @@
+R20 multi-device: 11 PASS
+R20 cross-device recovery: 9 PASS
+R20 fixed golden: 6 PASS
+R19 dynamic regression: 12 PASS
+R19 fixed package: 3 PASS
+R18 regression: 14 PASS
+R17 reference admission: 5 PASS
+R16 fixed golden: 5 PASS
+Independent Python BEP52: 2 PASS
+Independent Python BEP44: 3 PASS
+R15 fixed crypto: 7 PASS
+R14.1 canonical/editor core: 13 PASS
+TOTAL: 90 PASS
+Android build/runtime: NOT RUN

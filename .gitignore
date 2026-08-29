@@ -1,0 +1,20 @@
+# Build output. Reproducible from source, and the debug APK alone is 84 MB.
+build/
+.gradle/
+*.apk
+*.aab
+local.properties
+
+# Scratch: the pristine extraction used for diffing, conformance jars, working temp files.
+# Nothing here is a source of truth — the source is in android/ and relay/.
+work/
+
+# The Gradle 9.5.0 distribution (151 MB), downloaded rather than vendored. See README.
+toolchain/
+
+# Never in the repository. Tokens live in ~/.git-credentials, chmod 600.
+*.pem
+!android/app/src/main/res/raw/eidolang_relay.pem
+!android/feature-home/src/main/res/raw/eidolang_relay.pem
+.env
+*.keystore

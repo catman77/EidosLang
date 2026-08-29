@@ -1,0 +1,5 @@
+PASS R19 fixed package canonical parse and package-id verification
+PASS R19 fixed package embedded R16 segment verification
+PASS R19 fixed package torrent metainfo reproduction
+PACKAGE_ID=4c2e86bc96783a8f49f23f5dbd660b29b38cc2cc07f9ee7c6ea0f3973158e36b
+ALL R19 FIXED PACKAGE CHECKS PASS

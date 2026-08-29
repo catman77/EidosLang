@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EidogramMessageV1",
+  "type": "object",
+  "required": [
+    "body",
+    "message_id",
+    "signature"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "message_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "signature": {
+      "type": "object",
+      "required": [
+        "algorithm",
+        "value_b64"
+      ],
+      "additionalProperties": false
+    },
+    "body": {
+      "type": "object",
+      "required": [
+        "aad",
+        "ciphertext_b64",
+        "nonce_b64",
+        "recipient_boxes"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

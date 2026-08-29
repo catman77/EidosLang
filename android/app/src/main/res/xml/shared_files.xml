@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  What the app may hand to another app through the share sheet, and nothing else.
+  One directory inside the app's own cache: the QR code and exported chats are written there and
+  are the only things a share intent can ever reach. Exposing `files/` would put the sealed
+  identity, the contact stores and the onion service key one careless URI away from every
+  installed application.
+-->
+<paths>
+    <cache-path name="shared" path="shared/" />
+</paths>

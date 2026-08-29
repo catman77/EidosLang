@@ -1,0 +1,7 @@
+PASS fixed R21 canonical encrypted recovery backup identity
+PASS fixed R21 separate recovery code opens exact recovery-secret identity
+PASS fixed R21 backup-derived recovery secret opens the fixed R20.2 history vault
+PASS fixed R21 rollback anchor is deterministic over the fixed vault package
+PASS fixed R21 wrong-code and recomputed-id ciphertext tamper rejection
+PASS fixed R21 rollback-anchor identity tamper rejection
+ALL R21 FIXED GOLDEN CHECKS PASS

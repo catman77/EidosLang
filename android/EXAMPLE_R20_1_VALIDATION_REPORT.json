@@ -1,0 +1,78 @@
+{
+  "stage": "R20.1",
+  "status": "FORWARD_SESSION_CORE_COMPLETE_WITH_ARCHIVE_NO_GO",
+  "protocol_profile": {
+    "dh": "P-256 ECDH",
+    "kdf": "HKDF-SHA-256",
+    "chain": "HMAC-SHA-256",
+    "aead": "AES-256-GCM",
+    "bootstrap_auth": "R20 device ECDSA P-256"
+  },
+  "public_objects": [
+    "EidoDevicePreKeyBundleV1",
+    "EidoInitialSessionPacketV1",
+    "EidoRatchetPacketV1"
+  ],
+  "secret_local_objects": [
+    "EidoPreKeySecretStateV1",
+    "EidoForwardSessionSecretStateV1"
+  ],
+  "security_controls": [
+    "one-time prekey consumption",
+    "fresh DH/root ratchet",
+    "one-use symmetric message keys",
+    "bounded skipped-message key cache",
+    "used/skipped key removal",
+    "transactional receive rollback on AEAD failure",
+    "Android secret-blob logical name bound as GCM AAD"
+  ],
+  "claim_boundary": {
+    "forward_session_key_schedule": true,
+    "formal_signal_double_ratchet_equivalence_claimed": false,
+    "archive_forward_secrecy_claimed": false,
+    "post_quantum": false,
+    "java_heap_physical_zeroization_claimed": false
+  },
+  "archive_no_go": {
+    "result": "erased session keys + ciphertext-only archive + destructive recovery require an independent history/recovery secret domain",
+    "next_stage": "R20.2 Forward-Secure History Vault / Archive Migration"
+  },
+  "golden": {
+    "sha256": "796efb216481dec0b5913e4a2ae8d7ff922893471129a073c4ed255f3483b703",
+    "session_id": "005717251e39dea85a2ac757732909b64912f9f69556cd6d03322960b30eb838"
+  },
+  "executed_pass_counts": {
+    "r20_1_dynamic": 11,
+    "r20_1_fixed_golden": 6,
+    "r20_1_independent_python": 3,
+    "r20_multi_device": 11,
+    "r20_cross_device_recovery": 9,
+    "r20_fixed_golden": 6,
+    "r19_dynamic": 12,
+    "r19_fixed_package": 3,
+    "r18": 14,
+    "r17_reference": 5,
+    "r16_fixed": 5,
+    "r16_python_bep52": 2,
+    "r16_python_bep44": 3,
+    "r15_fixed": 7,
+    "r14_1": 13
+  },
+  "total_pass_lines": 110,
+  "android_runtime": {
+    "gradle_build_executed": false,
+    "android_keystore_runtime_executed": false,
+    "real_network_executed": false
+  },
+  "source_sha256": {
+    "core-session/src/main/java/org/eidolang/core/session/Kdf.kt": "5ce05be91a81b5c6926b64010f85dfa4a6e663072ef18a2e90cd68c78ab73afd",
+    "core-session/src/main/java/org/eidolang/core/session/PreKeys.kt": "413a2a02cb1f6172d2084c4d19bc1d78dbf56965b18d5b96b607e977583a4ec1",
+    "core-session/src/main/java/org/eidolang/core/session/Ratchet.kt": "97dc74018a0e91fe84d2203d25efd5a93b5ec7edc7e7aad15e8253134853ce7b",
+    "core-session/src/main/java/org/eidolang/core/session/SessionState.kt": "362f1a3e71676c2c3a92836a0a9aabfdf987ce6eb94c321127e528d1b4dbe51d",
+    "core-session/src/main/java/org/eidolang/core/session/AndroidSecretBlobStore.kt": "e96dfd7ffab6a4f700fb6fc8a9722e631d98c97f76415b736d9f5229a4466672",
+    "core-session/src/main/java/org/eidolang/core/session/ForwardSecureBridge.kt": "519e6717314addaf110a983aa32237562abd287b21bb8186ea7689e4f9a959b2",
+    "R20_1_METHODOLOGY.md": "0d14da65f24eb9dacd23a22a495d8cc4b39677eb26a2fffb5437f34b486e9a45",
+    "R20_1_SECURITY_MODEL.md": "d6c99b5be4a88f0054d73be130602692ffb513c079c418a153f2fe454a528473",
+    "R20_1_ARCHIVE_NO_GO.md": "a2fcaacaf91ec2c0118b8a25923e259d13bcbef02e46c521982e8bcdd6cd1934"
+  }
+}

@@ -1,0 +1,3 @@
+core-archive/src/main/java/org/eidolang/core/archive/Bencode.kt:99:49: warning: unnecessary non-null assertion (!!) on a non-null receiver of type ByteKey
+                    require(last == null || last!! < key) { "dictionary keys not strictly sorted" }
+                                                ^

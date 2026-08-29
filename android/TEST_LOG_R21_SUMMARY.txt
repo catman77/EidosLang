@@ -1,0 +1,28 @@
+R21 dynamic hardening: 11 PASS
+R21 fixed golden: 6 PASS
+R21 independent Python: 3 PASS
+R20.2 dynamic regression: 12 PASS
+R20.2 fixed regression: 6 PASS
+R20.2 Python regression: 3 PASS
+R20.1 dynamic regression: 11 PASS
+R20.1 fixed regression: 6 PASS
+R20.1 Python regression: 3 PASS
+R20 multi-device regression: 11 PASS
+R20 recovery regression: 9 PASS
+R20 fixed regression: 6 PASS
+R19 dynamic regression: 12 PASS
+R19 fixed regression: 3 PASS
+R18 regression: 14 PASS
+R17 regression: 5 PASS
+R16 fixed regression: 5 PASS
+Python BEP52: 2 PASS
+Python BEP44: 3 PASS
+R15 fixed regression: 7 PASS
+R14.1 regression: 13 PASS
+---------------------------------------------
+PRIOR R14.1-R20.2 SUBTOTAL: 131 PASS
+R21 ADDITIONS: 20 PASS
+TOTAL EXECUTED: 151 PASS
+Android Gradle/KeyStore runtime: NOT RUN
+SQLite page-level encryption: NOT CLAIMED
+Real network execution: NOT RUN / intentionally non-blocking

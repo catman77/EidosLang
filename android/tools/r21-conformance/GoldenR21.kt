@@ -1,0 +1,11 @@
+package org.eidolang.tools
+
+object GoldenR21 {
+    const val RECOVERY_BACKUP = "{\"backup_id\":\"de94310a0ab89b53463013ebbd9bfe6e6fcd18ad6e687eb08b3a1db7797eab56\",\"body\":{\"backup_key_id\":\"hvbk:5a7b05df35c84a2dedc2ee1f38397ce2ca8627f1e4269f24dccd96bef751cbe7\",\"backup_type\":\"EidoHistoryVaultRecoveryBackupV1\",\"backup_version\":\"1.0.0\",\"ciphertext_b64\":\"dxNxcKGomXgCR5Fr8V46etM97UMJUzCHIhQUarmpPpJuOu2tITaV73JjJumcb5ZA\",\"nonce_b64\":\"Yzpa84pQNhDSShHB\",\"recovery_key_id\":\"hvr:ae216c2ef5247a3782c135efa279a3e4cdc61094270f5d2be58c6204b7a612c9\",\"vault_id\":\"6e44acc0af3b2b56ac4a5e89914f6cb69b6855a4d597bf02c4eca8715aaed03e\"}}"
+    const val RECOVERY_CODE = "eidolang-recovery-v1:6e44acc0af3b2b56ac4a5e89914f6cb69b6855a4d597bf02c4eca8715aaed03e:hvbk:5a7b05df35c84a2dedc2ee1f38397ce2ca8627f1e4269f24dccd96bef751cbe7:lnZcnv_tDMK3LGu78ugG3-S6CcjRb38fGy31rhQeak0"
+    const val ROLLBACK_ANCHOR = "{\"anchor_id\":\"bb2ba692301792005488b6a2f84595b62cc640a5f68ff1a32c1e087d965d812f\",\"body\":{\"anchor_type\":\"EidoVaultRollbackAnchorV1\",\"anchor_version\":\"1.0.0\",\"contact_device_ids\":[\"dev:340928934e842a13b235a81c599d22ce00812683a14c1a31048821dbd693650a\"],\"epoch_ids\":[\"94b4278a33f9e68a066e876653d2fe9c39fb5761006d16240ac5f0d1c059f34c\"],\"last_package_id\":\"b013b6f44897f8253b6360df88ba252cdec897f40351aad1802f82a824d0d3d5\",\"message_entries\":[{\"entry_id\":\"bf166a5ea85a786b323533a9f7bddd0c244f5d64a4304320d8e3ecb3d6fa08c4\",\"message_id\":\"2aab690c34dbfaaa8e08760f3eb04884e57eaed7b79975482db5ed2e780af09d\"}],\"own_device_ids\":[\"dev:91009ce6d915d9becfd356dfc1c328b83c86bafdec2604fff078901203ec1817\",\"dev:d463ec48ede6f79a6a3f6ed6a9b540296d4fb1d4d65130d349fd1f81191f05db\"],\"rosters\":[{\"epoch\":0,\"roster_id\":\"ea783c4ee1841e277df2f1de0f655f4b79414d4c999ea8dd734df7f694935d99\",\"user_id\":\"cfc7224c382e0c30bf2f2e48b073cee5777fb34cd3fd3ca7ae81f638ec898b26\"}],\"vault_id\":\"6e44acc0af3b2b56ac4a5e89914f6cb69b6855a4d597bf02c4eca8715aaed03e\"}}"
+    const val BACKUP_ID = "de94310a0ab89b53463013ebbd9bfe6e6fcd18ad6e687eb08b3a1db7797eab56"
+    const val ANCHOR_ID = "bb2ba692301792005488b6a2f84595b62cc640a5f68ff1a32c1e087d965d812f"
+    const val VAULT_ID = "6e44acc0af3b2b56ac4a5e89914f6cb69b6855a4d597bf02c4eca8715aaed03e"
+    const val RECOVERY_KEY_ID = "hvr:ae216c2ef5247a3782c135efa279a3e4cdc61094270f5d2be58c6204b7a612c9"
+}

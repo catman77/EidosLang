@@ -1,0 +1,17 @@
+PASS first R18 history chunk archived as verified R16 segment
+PASS complete archive export refuses locally committed but unarchived messages
+PASS incremental archive emits only unarchived messages and advances segment lineage
+PASS archive pin state is independent of immutable R16 segment identity
+PASS full archive package canonical round-trip excludes private key material
+PASS delete-local-state model restores contacts/conversations/messages/timeline, including empty local state
+PASS exact archive package replay is idempotent
+PASS verified R16 segments alone reconstruct exact cryptographic message DAG and eidograms
+PASS deterministic overlapping-segment recovery deduplicates repeated messages
+PASS same MessageId/body with refreshed valid ECDSA proof is an idempotent duplicate
+PASS corrupt archive package is rejected before repository/archive mutation
+PASS R19 package refuses restore on a device lacking the bound historical decryption key
+SEGMENT_1=ad6d13602ceda456d6b7e32310843dca10375a2eda6c861ea82761e1c751386f
+SEGMENT_2=eb5154fad0a3e3d79263e4366021b85c9498d466cd1fb7e38eb73090ea13ab95
+PACKAGE_ID=cbda66bebd7718279eb08a0e726de82a42d9bf8c14cdca10f1a1ac31dbf74c4d
+PRIMARY_HEAD=2d95e03304a55a04648e086eeac70f5f59738b04448548d072d5e566888e615b
+ALL R19 ARCHIVE/RECOVERY CHECKS PASS

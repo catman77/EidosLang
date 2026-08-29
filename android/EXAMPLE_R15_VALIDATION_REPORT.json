@@ -1,0 +1,78 @@
+{
+  "stage": "R15",
+  "status": "PROTOCOL_IMPLEMENTED_PURE_KOTLIN_JCA_AND_FIXED_GOLDEN_PASS",
+  "crypto_suite": {
+    "signature": "ECDSA_P256_SHA256",
+    "key_wrap": "RSA_2048_OAEP_SHA256_MGF1_SHA1",
+    "payload": "AES_256_GCM"
+  },
+  "golden": {
+    "conversation_id": "47309d0261530f511489bcf5108a3a0f1bdc59fa88015aa7c84ece864d3959e3",
+    "message_id": "0c4f3821cf61c690edf79edeb4f380d1bc0e4b2de346d8d0fe2358cf83173e81",
+    "document_content_hash": "f98e76f2bb8b03a0b4d41bc983b5eb72fbbf88ea949ba8eaeb7af574e1b37bb6",
+    "document_snapshot_hash": "27b16e6600106c3809f11fa400b1c87c90fb1d06b4d5831fc3f1d2c7553e8e31",
+    "vector_sha256": "b2823095b656cb036d8e8979aea1dc9b7e2ceb375f6ca55578ec8dd06fbf1039"
+  },
+  "checks": {
+    "r15_dynamic_pass_lines": [
+      "PASS identity root/device certificate verification",
+      "PASS canonical public identity bundle round-trip",
+      "PASS canonical conversation descriptor round-trip",
+      "PASS signed encrypted message authentication",
+      "PASS canonical message envelope round-trip",
+      "PASS recipient and sender decrypt exact canonical eidogram",
+      "PASS ciphertext tamper rejected by signed body hash/signature",
+      "PASS metadata tamper rejected",
+      "PASS cross-conversation replay binding",
+      "PASS non-canonical message rejected",
+      "PASS wrong private key cannot unwrap recipient key"
+    ],
+    "r15_fixed_golden_pass_lines": [
+      "PASS R15 fixed golden public identity validation",
+      "PASS R15 fixed golden message signature verification",
+      "PASS R15 fixed golden RSA-OAEP/AES-GCM decryption for Bob",
+      "PASS R15 fixed golden sender self-decryption",
+      "PASS R15 fixed golden document hash/snapshot recovery",
+      "PASS R15 fixed golden signature tamper rejection",
+      "PASS R15 fixed golden conversation-binding rejection"
+    ],
+    "r14_1_regression_pass_lines": [
+      "PASS 00_empty content=2fab39fd5d0ff713f059c39b67878cbb7aad2bc6cc50107247e160bb74ad2d10 snapshot=bc3457aa472a1be801c5152e4ee2b58ee96ebf37cb184a6c06e75ee32d9e7e4d",
+      "PASS 01_red_circle content=41e46a7b1b69fd012cc21ed9020fb1119ee00c33dfcc9924a684a788577b099b snapshot=e4fa9396a0bee8e4d7c42db0d2e3ec2800e115bc183b32f35f27692c678d4522",
+      "PASS 02_stick_dot_outline content=f43ad42268e705559ff6b5c819059edc870e63e79ac21e3f28143a4e57fc7aee snapshot=2043b5415d0d47dc7466976be94caaf0d3654a1685daa984c671304e954cb7fd",
+      "PASS 03_red_circle_direct content=41e46a7b1b69fd012cc21ed9020fb1119ee00c33dfcc9924a684a788577b099b snapshot=e4fa9396a0bee8e4d7c42db0d2e3ec2800e115bc183b32f35f27692c678d4522",
+      "PASS 04_red_circle_via_blue content=32d054bedc25a6dbdafa802755430b00395716ee86858fa61e99f28dfc5ff76c snapshot=e4fa9396a0bee8e4d7c42db0d2e3ec2800e115bc183b32f35f27692c678d4522",
+      "PASS 05_group_transform content=3f2a90a488296b1ed1e9bba3db9a0637694dfc3788ef8a3b9577a0ef9564ab26 snapshot=deb1741d37e9f858d0061af11d0f588e7ab607bf4baf67a149a81586b2060716",
+      "PASS editor reducer undo/redo",
+      "PASS strict canonical parser round-trip",
+      "PASS non-canonical import rejection",
+      "PASS duplicate-key and lineage rejection",
+      "PASS geometry-aware hit testing",
+      "PASS grouped selection semantics",
+      "PASS draft restore counters"
+    ]
+  },
+  "android": {
+    "keystore_adapter_source": true,
+    "android_gradle_build_executed": false,
+    "runtime_keystore_test_executed": false,
+    "blocker": "No Android SDK/emulator in artifact environment"
+  },
+  "security_limitations": [
+    "No forward secrecy in R15 static RSA recipient-key wrapping",
+    "Conversation/sender/recipient-key/parent/sequence/time metadata remain visible",
+    "Persistent replay-state enforcement deferred to local message repository"
+  ],
+  "next_stage": "R16 Torrent Archive Model",
+  "source_sha256": {
+    "core-crypto/src/main/java/org/eidolang/core/crypto/CryptoPrimitives.kt": "4afca776d8c954bd79b95a424d755f0abbda4afbb6331929ed4ec9ce127f6294",
+    "core-crypto/src/main/java/org/eidolang/core/crypto/Identity.kt": "35a0ce345cfbdc44b2cd1b98eef2e1547d9730bab26261c0b81064ca8b4d3910",
+    "core-crypto/src/main/java/org/eidolang/core/crypto/IdentityParser.kt": "cc7f069319d8d471195ba198dba396f0f3887da01cb3066981cc1b69a3ff7c4a",
+    "core-crypto/src/main/java/org/eidolang/core/crypto/AndroidKeystoreIdentityStore.kt": "f880f81b18f7231069cd9f3af1e23b0d5e64abb3d7f16b638aac4cf7724f4ce7",
+    "core-message/src/main/java/org/eidolang/core/message/MessageModel.kt": "61187951a407a2b31bfe47c3a3fd0d3b8ffe718b3613f1c3e9682b73a7ac3bd2",
+    "core-message/src/main/java/org/eidolang/core/message/MessageCrypto.kt": "0e6a70c75ee41410feac08e18c50c326547ae97e154013ddbf26150cbde4dee9",
+    "core-message/src/main/java/org/eidolang/core/message/MessageParser.kt": "feef06133ae20888e0bffccecf7f49e1e3b5d71f95afccbace2b71ce98fb2834",
+    "core-message/src/main/java/org/eidolang/core/message/ConversationParser.kt": "c7eded20612d20d8d378bec39dd51a6b0618fbaf62fc3a12e28445b2213107f5",
+    "golden/r15/r15_crypto_golden_v1.json": "b2823095b656cb036d8e8979aea1dc9b7e2ceb375f6ca55578ec8dd06fbf1039"
+  }
+}

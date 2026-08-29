@@ -1,0 +1,18 @@
+PASS initial root-signed single-device rosters
+PASS legacy message predates secondary devices
+PASS root-authorized secondary-device enrollment with possession proof
+PASS explicit multi-device roster activates certified sibling/contact devices
+PASS historical key grants migrate legacy ciphertext without changing MessageId
+PASS new message carries key boxes for all active local and remote devices
+PASS concurrent same-user devices converge to identical branch-head set
+PASS merge message collapses concurrent branches and all devices have identical causal timeline
+PASS revocation blocks new device messages but preserves/idempotently replays accepted history
+PASS revoked device removed from future recipient key boxes
+PASS roster rollback/re-activation attempt rejected
+ALICE_USER_ID=ae37ed39a8da3caa368f4e3478b7cfa75b2a5374880301efd999ace1a4af9a6b
+ALICE_DEVICE_1=dev:71df55f374b9d8abfb06f34bb5043c4f0b4b5009dda173bea661503828363b3c
+ALICE_DEVICE_2=dev:e5170cdaeca69eaa58f013cb529bb17f5dd7154ec306f76c33f859950527346f
+BOB_DEVICE_1=dev:1f97b7ad7890c4cfae37453c696d4a5a991bbf053aedb65d2189f0cac09651bb
+BOB_DEVICE_2=dev:4f8b8e790b8bcdf59f92e3e2f49fd23b4c16ce9b628f6a3cab5a2776b5fcd836
+FINAL_HEAD=edf88fc2feee54eee192a3d013f37847b73e056994bc67b4901159d8845e9eec
+ALL R20 MULTI-DEVICE CONFORMANCE CHECKS PASS

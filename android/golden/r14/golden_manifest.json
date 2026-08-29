@@ -1,0 +1,48 @@
+{
+  "format": "r14-glyph-document-goldens-v1",
+  "catalog_hash": "da2d3b72ff8d41abb8c293ce1deca44e99cb1d1a696e9834997395c6f6218005",
+  "vectors": [
+    {
+      "name": "00_empty",
+      "file": "00_empty.json",
+      "byte_length": 532,
+      "content_hash": "2fab39fd5d0ff713f059c39b67878cbb7aad2bc6cc50107247e160bb74ad2d10",
+      "snapshot_hash": "bc3457aa472a1be801c5152e4ee2b58ee96ebf37cb184a6c06e75ee32d9e7e4d"
+    },
+    {
+      "name": "01_red_circle",
+      "file": "01_red_circle.json",
+      "byte_length": 718,
+      "content_hash": "41e46a7b1b69fd012cc21ed9020fb1119ee00c33dfcc9924a684a788577b099b",
+      "snapshot_hash": "e4fa9396a0bee8e4d7c42db0d2e3ec2800e115bc183b32f35f27692c678d4522"
+    },
+    {
+      "name": "02_stick_dot_outline",
+      "file": "02_stick_dot_outline.json",
+      "byte_length": 1111,
+      "content_hash": "f43ad42268e705559ff6b5c819059edc870e63e79ac21e3f28143a4e57fc7aee",
+      "snapshot_hash": "2043b5415d0d47dc7466976be94caaf0d3654a1685daa984c671304e954cb7fd"
+    },
+    {
+      "name": "03_red_circle_direct",
+      "file": "03_red_circle_direct.json",
+      "byte_length": 718,
+      "content_hash": "41e46a7b1b69fd012cc21ed9020fb1119ee00c33dfcc9924a684a788577b099b",
+      "snapshot_hash": "e4fa9396a0bee8e4d7c42db0d2e3ec2800e115bc183b32f35f27692c678d4522"
+    },
+    {
+      "name": "04_red_circle_via_blue",
+      "file": "04_red_circle_via_blue.json",
+      "byte_length": 796,
+      "content_hash": "32d054bedc25a6dbdafa802755430b00395716ee86858fa61e99f28dfc5ff76c",
+      "snapshot_hash": "e4fa9396a0bee8e4d7c42db0d2e3ec2800e115bc183b32f35f27692c678d4522"
+    },
+    {
+      "name": "05_group_transform",
+      "file": "05_group_transform.json",
+      "byte_length": 1169,
+      "content_hash": "3f2a90a488296b1ed1e9bba3db9a0637694dfc3788ef8a3b9577a0ef9564ab26",
+      "snapshot_hash": "deb1741d37e9f858d0061af11d0f588e7ab607bf4baf67a149a81586b2060716"
+    }
+  ]
+}

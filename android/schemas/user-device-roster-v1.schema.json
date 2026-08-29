@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EidoUserDeviceRosterV1",
+  "type": "object",
+  "required": [
+    "body",
+    "root_signature_b64",
+    "roster_id"
+  ],
+  "additionalProperties": false
+}

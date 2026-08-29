@@ -1,0 +1,89 @@
+{
+  "stage": "R22",
+  "status": "SOURCE_PRODUCT_INTEGRATION_COMPLETE_ANDROID_RUNTIME_ADMISSION_PENDING",
+  "wire_protocol_change": false,
+  "new_modules": [
+    "feature-onboarding",
+    "core-admission"
+  ],
+  "product_integrations": [
+    "explicit primary-vs-secondary first-run identity choice",
+    "root-authorized secondary enrollment and roster activation",
+    "primary device authorization/revocation UI",
+    "persistent R20.2 secure vault product path",
+    "R21 encrypted recovery backup plus separate recovery code",
+    "explicit FRESHNESS UNPROVEN confirmation on fresh offline restore",
+    "verified R19→R20.2 migration/cutover and retired-artifact enforcement",
+    "SQLite v2→v3 encrypted contact alias/conversation title migration",
+    "Android runtime admission probe and Diagnostics UI",
+    "Android auto-backup disabled",
+    "cleartext traffic disabled"
+  ],
+  "claim_boundary": {
+    "android_gradle_build_executed": false,
+    "android_instrumentation_executed": false,
+    "android_keystore_runtime_probe_executed": false,
+    "sqlite_v3_android_runtime_migration_executed": false,
+    "fresh_offline_global_freshness_claimed": false,
+    "full_sqlite_page_encryption_claimed": false,
+    "external_legacy_copy_deletion_claimed": false,
+    "real_network_execution_claimed": false
+  },
+  "environment": {
+    "android_home_configured": false,
+    "android_sdk_root_configured": false,
+    "adb_available": false,
+    "system_gradle_available": false,
+    "gradle_wrapper_jar_vendored": false,
+    "pure_kotlin_compiler": "kotlinc current (container)"
+  },
+  "fixed_artifacts": {
+    "r22_product_acceptance_sha256": "509b23904b580b0e03b229a043bfaf7ef8bd92b15ac4eb6b4aae71a339492dda",
+    "r20_2_history_vault_golden_sha256": "b1ce569e770200806a003ae867d90096d9720f0240aed015db96ae49951fb0b8",
+    "r21_hardening_golden_sha256": "8088b67350694162f6851b3f0e8a19a382804fb3148ad6ef8d8f25f9d0735350"
+  },
+  "executed_pass_counts": {
+    "r22_product_journey": 11,
+    "r22_fixed_product": 5,
+    "r22_android_source_audit": 13,
+    "r14_1": 13,
+    "r15_fixed": 7,
+    "r16_fixed": 5,
+    "r16_python_bep52": 2,
+    "r16_python_bep44": 3,
+    "r17": 5,
+    "r18": 14,
+    "r19": 12,
+    "r19_fixed": 3,
+    "r20": 11,
+    "r20_recovery": 9,
+    "r20_fixed": 6,
+    "r20_1": 11,
+    "r20_1_fixed": 6,
+    "r20_1_python": 3,
+    "r20_2": 12,
+    "r20_2_fixed": 6,
+    "r20_2_python": 3,
+    "r21": 11,
+    "r21_fixed": 6,
+    "r21_python": 3
+  },
+  "prior_regression_subtotal": 151,
+  "r22_additions": 29,
+  "total_pass_lines": 180,
+  "next_stage": "R22.1 Android device admission",
+  "source_sha256": {
+    "app/src/main/AndroidManifest.xml": "af11e70b92fdf1e4414b9c704301e37515840421e5cf6168770bfc2db3a09eaf",
+    "app/src/main/java/org/eidolang/app/MainActivity.kt": "eab800e4c506b1ccdec1b66f5ed19a456bc16d7409aeeac6845959180cc50ade",
+    "app/src/androidTest/java/org/eidolang/app/MessengerSmokeTest.kt": "8e110e0aad3f1a6b880ce3c731e73d8c98fee66ade2f378b7f1827eeb239924a",
+    "feature-onboarding/src/main/java/org/eidolang/feature/onboarding/EidoOnboarding.kt": "b925bf405f68f494895edc1ffafa101de5bc3395acd0a73c9cb4217940d5b542",
+    "feature-messenger/src/main/java/org/eidolang/feature/messenger/EidoMessengerApp.kt": "c4e3b7f1b808817593d76502b09a2e8e365d93ccfaf066a4894d4b9a3c98058a",
+    "feature-archive/src/main/java/org/eidolang/feature/archive/ArchiveScreen.kt": "72e10724d75ada396db612e8c8fccf52bf35c8f39763e88a198e4aec557e6bca",
+    "core-crypto/src/main/java/org/eidolang/core/crypto/AndroidKeystoreIdentityStore.kt": "27b91cf2609502bdebb621122852ad5edb69977b83440c69c18402fa32fe27d2",
+    "core-repository/src/main/java/org/eidolang/core/repository/AndroidSqliteMessengerRepository.kt": "d8a1da97ba5eb6581bbb79c55b7b867981c59df14c7e71c4997b02c2089f5e21",
+    "core-hardening/src/main/java/org/eidolang/core/hardening/AndroidRepositoryTextProtector.kt": "43a6e6e27f3c6ad65376daca682a231edb0585eff91ff0610a2533ce029f61bb",
+    "core-vault/src/main/java/org/eidolang/core/vault/AndroidHistoryVaultPackageStore.kt": "98e67466a7951a1571050245624db9639ddffe32e5248befb6ad9b276b24c20c",
+    "core-admission/src/main/java/org/eidolang/core/admission/AndroidAdmissionProbe.kt": "8a63f779936b5e4ce12f62825ef64e2e1a73d0ae08dbe06ced2238196b9c8c95",
+    "tools/r22-android-admission.sh": "07cbc46a2889b7c2a3ba2094306a740e08af61875899b371495da8b0de566972"
+  }
+}

@@ -1,0 +1,16 @@
+PASS encrypted recovery backup contains no raw recovery secret and opens only with separate code
+PASS wrong recovery code and authenticated-backup ciphertext tamper are fail-closed
+PASS fresh offline restore exposes signed-archive freshness as unprovable rather than pretending old==latest
+PASS local rollback anchor accepts monotonic extension and rejects older valid signed package
+PASS vault epoch fork is rejected once one branch is locally anchored
+PASS cross-vault and entry-header substitution fail before historical plaintext release
+PASS signed-but-truncated history with missing DAG parent causes zero mutation
+PASS skipped-message DoS above configured bound is rejected with exact ratchet rollback
+PASS pending one-time prekey resource growth is explicitly bounded
+PASS migrate?verify cutover receipt binds equivalent history and blocks exact retired legacy artifact
+PASS deterministic mutation corpus rejects 128 vault-package and 96 recovery-backup mutations
+NEWER_PACKAGE_ID=13ace0fffda2ef67532c35fba387f3612b2a9e71c54c8f9b2b8be8769093182a
+ROLLBACK_ANCHOR_ID=d9597c58eefb5405ee269c8aa28d7f2e650acc2a97559c271c192116e50ff736
+CUTOVER_ID=196d1f718ef443d1556df16c4002bbfa59bad4d687faba53068e4f697afb0612
+RECOVERY_BACKUP_ID=b7b3bf1583a1819666ca8ff60e9a8849f0edb4d547f39a69915f8dcb62155c83
+ALL R21 SECURITY HARDENING CHECKS PASS

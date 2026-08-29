@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EidoHistoryVaultArchivePackageV1",
+  "type": "object",
+  "required": [
+    "body",
+    "exporter_signature_b64",
+    "package_id"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EidoDeviceEnrollmentRequestV1",
+  "type": "object",
+  "required": [
+    "body",
+    "possession_signature_b64",
+    "request_id"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EidoHistoryVaultEpochV1",
+  "type": "object",
+  "required": [
+    "body",
+    "epoch_id"
+  ],
+  "additionalProperties": false
+}

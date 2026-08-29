@@ -1,0 +1,4 @@
+PASS independent Python BEP44 Ed25519 signature
+PASS independent Python BEP44 target SHA1(k||salt)
+PASS independent Python BEP44 value <=1000 bytes
+TARGET=06ed00b9aa03a6f26a30069a823c115d1f1792ca

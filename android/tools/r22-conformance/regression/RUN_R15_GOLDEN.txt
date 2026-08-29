@@ -1,0 +1,8 @@
+PASS R15 fixed golden public identity validation
+PASS R15 fixed golden message signature verification
+PASS R15 fixed golden RSA-OAEP/AES-GCM decryption for Bob
+PASS R15 fixed golden sender self-decryption
+PASS R15 fixed golden document hash/snapshot recovery
+PASS R15 fixed golden signature tamper rejection
+PASS R15 fixed golden conversation-binding rejection
+ALL R15 FIXED GOLDEN CHECKS PASS

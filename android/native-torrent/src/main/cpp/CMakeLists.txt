@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 3.22.1)
+project(eidolang_torrent LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# R17 pins libtorrent 2.1.1. Vendor it at third_party/libtorrent before enabling this build.
+set(LIBTORRENT_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../../third_party/libtorrent" CACHE PATH "libtorrent source root")
+if(NOT EXISTS "${LIBTORRENT_ROOT}/CMakeLists.txt")
+  message(FATAL_ERROR "libtorrent source missing. See ENABLE_NATIVE_LIBTORRENT.md")
+endif()
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(webtorrent OFF CACHE BOOL "" FORCE)
+add_subdirectory("${LIBTORRENT_ROOT}" "${CMAKE_BINARY_DIR}/libtorrent" EXCLUDE_FROM_ALL)
+add_library(eidolang_torrent SHARED eidolang_libtorrent_jni.cpp)
+target_link_libraries(eidolang_torrent PRIVATE torrent-rasterbar log android)

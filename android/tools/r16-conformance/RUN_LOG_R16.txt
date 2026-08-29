@@ -1,0 +1,18 @@
+PASS immutable segment build + message DAG head derivation
+PASS deterministic segment/torrent independent of input ordering
+PASS BEP52 v2 metainfo + btmh magnet + piece layers
+PASS downloaded-file reconstruction and cryptographic verification
+PASS archive file tamper rejection
+PASS torrent path traversal rejection
+PASS R15-device-signed BEP44 publisher-key binding
+PASS BEP44 mutable head signature/target/value budget
+PASS BEP44 sequence tamper requires new signature
+PASS same publisher+conversation yields stable DHT target with monotonic seq
+CONVERSATION_ID=47309d0261530f511489bcf5108a3a0f1bdc59fa88015aa7c84ece864d3959e3
+SEGMENT_ID=78aa678b7004e0acb800bcc0732d39c41028db776da51cbc0018e22e8af0d25b
+TORRENT_INFOHASH_V2=d53c6a8c2d521374d8cf38d025b5dfa273c59b3df75d44f26d7a495340d45129
+MAGNET=magnet:?xt=urn:btmh:1220d53c6a8c2d521374d8cf38d025b5dfa273c59b3df75d44f26d7a495340d45129&dn=eidolang-47309d026153-78aa678b7004
+HEAD_MESSAGE_ID=74bfbcace354b2864708ab9c014e2150a0583a733d2c9e62facda6a92523fa1b
+BEP44_TARGET=06ed00b9aa03a6f26a30069a823c115d1f1792ca
+BEP44_VALUE_BYTES=310
+ALL R16 PURE-KOTLIN/JCA ARCHIVE CHECKS PASS

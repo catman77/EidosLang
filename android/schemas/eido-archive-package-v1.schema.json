@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EidoArchivePackageV1",
+  "type": "object",
+  "required": ["body", "package_id"],
+  "additionalProperties": false,
+  "properties": {
+    "package_id": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "body": {
+      "type": "object",
+      "required": [
+        "contacts",
+        "conversations",
+        "owner_user_id",
+        "package_type",
+        "package_version",
+        "pinned_segment_ids",
+        "recovery_device_id",
+        "recovery_encryption_key_id",
+        "segments"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "package_type": {"const": "EidoArchivePackageV1"},
+        "package_version": {"const": "1.0.0"},
+        "owner_user_id": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "recovery_device_id": {"type": "string", "pattern": "^dev:[0-9a-f]{64}$"},
+        "recovery_encryption_key_id": {"type": "string", "pattern": "^enc:[0-9a-f]{64}$"},
+        "contacts": {"type": "array"},
+        "conversations": {"type": "array"},
+        "segments": {"type": "array"},
+        "pinned_segment_ids": {"type": "array", "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+      }
+    }
+  }
+}

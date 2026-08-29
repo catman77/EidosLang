@@ -1,0 +1,3 @@
+PASS independent Python R21 recovery-backup canonical SHA-256 identity
+PASS independent Python R21 AES-GCM recovery backup opens exact recovery-secret identity
+PASS independent Python R21 rollback-anchor SHA-256 and backup AEAD mutation rejection

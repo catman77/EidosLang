@@ -1,0 +1,20 @@
+PASS contact identity import and local alias
+PASS refreshed ECDSA certificate proof does not fork contact identity
+PASS shared canonical conversation descriptor
+PASS first outgoing message committed as DAG head
+PASS manual incoming admission decrypts exact eidogram
+PASS exact message replay is idempotent
+PASS reply parent edge produces deterministic causal timeline
+PASS sender sequence increments and current head advances
+PASS same sender/device sequence with different message is rejected
+PASS incoming message without local recipient key box is rejected
+PASS conversation import requires known participant identities
+PASS out-of-order arrival retained and deterministically reordered
+PASS new local message merges all current DAG branches
+PASS conversation summary derives message count and heads
+ALICE_USER_ID=c2e7122c02ef1d61dcd688befa24d88f86eeb24671627f00e87163bc1b78e22e
+BOB_USER_ID=b49e4a9f1a4347b3128ec3f769d4cab63e10dfbccc396d1ba64a2755e114fd34
+PRIMARY_CONVERSATION_ID=7be8467f9f2a4b4a2bdc881ea561049daee143303858b1e59203fab0f70a53fe
+PRIMARY_HEAD=634af75d22b4ae2fee1c1b5f9d80cbbb30113e6784e84eb0086274f1883137d0
+BRANCH_MERGE_HEAD=3d60cdb8c5bacdee77edc6a71f4873e8cd306ec57a428582ee800c839761a5c9
+ALL R18 PURE-KOTLIN MESSENGER/REPOSITORY CHECKS PASS

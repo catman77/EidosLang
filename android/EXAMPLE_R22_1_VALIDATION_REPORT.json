@@ -1,0 +1,85 @@
+{
+  "stage": "R22.1",
+  "status": "ANDROID_BUILD_AND_DEVICE_ADMISSION_PASS_REAL_TRANSPORT_THROUGH_INTERFACE_OWN_JNI_UNBUILT",
+  "wire_protocol_change": false,
+  "new_modules": [
+    "transport-libtorrent4j"
+  ],
+  "build_fixes": [
+    "migrated all 23 module scripts to AGP built-in Kotlin",
+    "native-torrent namespace off the 'native' Java keyword",
+    "core-vault -> core-archive dependency declared",
+    "feature-archive -> core-multidevice dependency declared"
+  ],
+  "defects_fixed": [
+    "ArchiveScreen secure-restore button bound a function reference instead of a call",
+    "SQLite v3 sensitive-text logicalId violated the AndroidLocalSecretBox contract, blocking every contact and conversation insert",
+    "Ed25519 unavailable below API 35: no general-purpose KeyFactory or KeyPairGenerator, so the whole BEP44 head layer was inoperable against the declared minSdk 26; moved to Bouncy Castle's low-level signer"
+  ],
+  "transport": {
+    "backend": "org.libtorrent4j:2.1.0-35 (prebuilt Android binding of libtorrent 2.x)",
+    "pinned_version_in_R17_DEPENDENCY_PIN": "2.1.1",
+    "version_deviation_accepted": true,
+    "puts_pre_signed": false,
+    "puts_signed_by_libtorrent_with_publisher_seed": true,
+    "get_head_addressed_by_public_key_and_salt": true,
+    "publisher_key_persisted_sealed": true,
+    "ed25519_backend": "org.bouncycastle:bcprov-jdk18on:1.78.1 low-level signer (no JCA provider registration)"
+  },
+  "claim_boundary": {
+    "own_jni_backend_built": false,
+    "pinned_libtorrent_2_1_1_built": false,
+    "enable_native_libtorrent_md_discharged": false,
+    "r17_1_item_8_session_state_executed": false,
+    "r17_1_item_9_process_restart_executed": false,
+    "ui_driven_transport_executed": false,
+    "public_internet_execution": false,
+    "strongbox_claimed": false,
+    "r14_1_to_r21_regression_reproduced": false
+  },
+  "environment": {
+    "gradle": "9.5.0",
+    "agp": "9.3.0",
+    "kotlin_gradle": "2.3.21 built-in AGP Kotlin",
+    "pure_kotlinc": "2.3.10 (Android Studio bundled)",
+    "compile_sdk_platform": "android-37.0",
+    "device": "samsung SM-G996N, Android 15, SDK 35, arm64-v8a, verifiedbootstate=green",
+    "secondary_device": "emulator android-34 google_apis x86_64",
+    "host_libtorrent": "libtorrent-rasterbar 2.1.0"
+  },
+  "executed_counts": {
+    "pure_host_conformance": 43,
+    "real_bittorrent_host": 16,
+    "android_instrumentation_tests": 13,
+    "two_device_enrollment_steps": 6
+  },
+  "keystore_security_level": {
+    "eidolang.root-signing.v1": "TRUSTED_ENVIRONMENT",
+    "eidolang.device-signing.v1": "TRUSTED_ENVIRONMENT",
+    "eidolang.device-decrypt.v1": "TRUSTED_ENVIRONMENT",
+    "eidolang.local-sensitive-wrap.v1": "TRUSTED_ENVIRONMENT",
+    "eidolang.history-vault-secret-wrap.v1": "TRUSTED_ENVIRONMENT"
+  },
+  "fixed_artifacts": {
+    "r16_segment_id": "78aa678b7004e0acb800bcc0732d39c41028db776da51cbc0018e22e8af0d25b",
+    "r16_torrent_infohash_v2": "d53c6a8c2d521374d8cf38d025b5dfa273c59b3df75d44f26d7a495340d45129",
+    "r16_bep44_target": "06ed00b9aa03a6f26a30069a823c115d1f1792ca"
+  },
+  "instrumentation_execution": {
+    "default_suite_tests": 8,
+    "native_session_heavy_tests": 5,
+    "total": 13,
+    "single_suite_supported": false,
+    "reason": "libtorrent sessions do not release native threads in time for Compose UI tests in the same process",
+    "ui_tests_require_device_awake_and_unlocked": true
+  },
+  "message_delivery": {
+    "executed": true,
+    "sender": "SM-G996N (API 35)",
+    "receiver": "emulator android-34",
+    "payload_transport": "BitTorrent v2 over an adb forward bridge",
+    "control_plane_transport": "files (the devices share no DHT)",
+    "message_id_preserved": true,
+    "document_hash_preserved": true
+  }
+}

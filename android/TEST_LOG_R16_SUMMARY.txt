@@ -1,0 +1,9 @@
+R16 dynamic final: 10 PASS
+R16 fixed golden: 5 PASS
+Independent Python BEP52: 2 PASS
+Independent Python BEP44: 3 PASS
+R15 fixed regression: 7 PASS
+R14.1 regression: 13 PASS
+TOTAL targeted checks: 40 PASS
+Actual DHT/swarm networking: NOT RUN (R17)
+Android SDK/NDK build: NOT RUN in artifact environment

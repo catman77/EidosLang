@@ -1,0 +1,14 @@
+PASS MainActivity routes through explicit first-run EidoRootApp
+PASS first-run source contains separate primary and secondary roles
+PASS secondary onboarding requires enrollment request, authorized bundle and root-signed roster
+PASS Android primary identity store has non-creating loadIfPresent boundary and no duplicate rootPublic declaration
+PASS device management source includes root authorization, roster export and revocation
+PASS secure archive UI includes R20.2 restore, R21 recovery backup and explicit freshness warning
+PASS legacy migration UI requires history equivalence/cutover receipt path
+PASS legacy import UI blocks an exact artifact committed as retired by cutover receipt
+PASS SQLite repository is v3 and protects alias/title fields
+PASS DraftStore uses AndroidLocalSecretBox and encrypted .bin persistence
+PASS Android runtime admission probe exercises identity, RSA, secret-box, vault store and repository storage
+PASS Android platform backup is disabled and cleartext traffic is forbidden
+PASS R22 modules/version are wired without making networking an admission dependency
+ALL R22 ANDROID SOURCE-AUDIT CHECKS PASS

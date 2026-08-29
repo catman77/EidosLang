@@ -1,0 +1,64 @@
+{
+  "stage": "R20",
+  "status": "MULTI_DEVICE_PROTOCOL_CORE_AND_CROSS_DEVICE_RECOVERY_PASS",
+  "new_module": "core-multidevice",
+  "protocol_objects": [
+    "EidoDeviceEnrollmentRequestV1",
+    "EidoUserDeviceRosterV1",
+    "EidoMessageKeyGrantV1",
+    "EidoMultiDeviceRecoveryCapsuleV1"
+  ],
+  "invariants": {
+    "device_enrollment": "secondary device generates private keys locally; root signs only certified public-key body",
+    "roster": "root-signed exact successor chain after bootstrap; revocation set monotone",
+    "revocation": "prospective for new messages and new key boxes; accepted history remains valid",
+    "message_identity_preserved_by_migration": true,
+    "multi_device_recipient_fanout": true,
+    "dag_convergence": "message-set union + all-head parent merge",
+    "r19_second_device_recovery": true,
+    "historical_grants_preserved_in_future_r20_companion_capsules": true
+  },
+  "fixed_golden": {
+    "sha256": "2c87c46a8c3cf21ef4c85b971d33bcb17294a6bd125629ccf8e7db6e332e0eb3",
+    "legacy_message_id": "392fed55f1a63a2a33a412accabb834ec3b3996092d20a8ae2cb30d20d68e7a6",
+    "document_content_hash": "39e58a73d1ecb6e2578e1ad4b119418d8685aefab1833f7d192d6a0edd7a261a",
+    "r19_package_id": "4972e806729ba7ef355aded211771633a92f211f0a1305e157585175b71cb409",
+    "r20_capsule_id": "f671341a847b10b23a8ac864843e1607048c3d39ff919a76667d213e562862eb"
+  },
+  "executed_pass_counts": {
+    "r20_multidevice": 11,
+    "r20_recovery": 9,
+    "r20_fixed_golden": 6,
+    "r19_dynamic": 12,
+    "r19_fixed": 3,
+    "r18": 14,
+    "r17": 5,
+    "r16_fixed": 5,
+    "r16_py_bep52": 2,
+    "r16_py_bep44": 3,
+    "r15_fixed": 7,
+    "r14_1": 13
+  },
+  "total_pass_lines": 90,
+  "android_runtime": {
+    "android_gradle_build_executed": false,
+    "android_keystore_secondary_onboarding_executed": false,
+    "sqlite_v1_to_v2_migration_instrumentation_executed": false,
+    "real_network_execution": false,
+    "reason": "Android SDK/emulator and real network execution are outside the current artifact environment/project direction"
+  },
+  "next_stage": "R20.1 Forward-Secrecy Session Layer",
+  "source_sha256": {
+    "core-multidevice/src/main/java/org/eidolang/core/multidevice/Enrollment.kt": "3df9a6b20ae3b282f7c028786e833d8599b84b4cadb0965b42fd0d34a5770d31",
+    "core-multidevice/src/main/java/org/eidolang/core/multidevice/Roster.kt": "405b1e3a2fd884956a7227ec4dbed910f1e1294d6614b143db95cc8ab6625556",
+    "core-multidevice/src/main/java/org/eidolang/core/multidevice/KeyGrant.kt": "0879c55970a995738c972a2b6e3bb397ac429a5aa2c700ed2644d1f401e787e0",
+    "core-multidevice/src/main/java/org/eidolang/core/multidevice/AndroidDeviceOnboarding.kt": "4b6cda6c671f6dc326bd122adf16cd316bea3f786654c4cdc2c25f8520a91078",
+    "core-repository/src/main/java/org/eidolang/core/repository/RepositoryModel.kt": "a14a394171a307d2fc9b45433632c651082c823d668db3a8bdabe61a0d8e3b44",
+    "core-repository/src/main/java/org/eidolang/core/repository/InMemoryMessengerRepository.kt": "716e171d491154485e9608afd1d86c93cdae479237a4e5a80fb463ff2e71c367",
+    "core-repository/src/main/java/org/eidolang/core/repository/AndroidSqliteMessengerRepository.kt": "3b666b489101994a71f3b1e9aed16fd603c45f7b4d2f92423f877b15202c737b",
+    "core-repository/src/main/java/org/eidolang/core/repository/MessengerService.kt": "ffde05c54b8aa77d96e9a1199c58d92dc2f1e66695486ae943647ba3cd168e49",
+    "core-recovery/src/main/java/org/eidolang/core/recovery/MultiDeviceRecovery.kt": "cf06ff7443efd553f4191378c018815e0c1c462ed9e2a9ec1314bb7b8b2875ec",
+    "core-recovery/src/main/java/org/eidolang/core/recovery/ArchiveCoordinator.kt": "f44abd3c27cb5be0749f3d976e759017523f447e775d17512f25a6b45a33fd74",
+    "golden/r20/r20_multidevice_golden_v1.json": "2c87c46a8c3cf21ef4c85b971d33bcb17294a6bd125629ccf8e7db6e332e0eb3"
+  }
+}

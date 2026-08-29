@@ -1,0 +1,13 @@
+PASS source archive captures pre-secondary-device history
+PASS source creates grants only for ciphertext lacking the new device key box
+PASS canonical recovery capsule binds source package, active target and historical grants
+PASS R19 package restores on second authorized device with identical DAG and eidograms
+PASS historical key grants persist as local decryption supplements
+PASS recovered secondary device continues the same DAG and encrypts back to sibling device
+PASS migrated-device backups preserve historical grants through the R20 companion capsule
+PASS incomplete migration capsule fails before repository/archive mutation
+PASS revoked target device cannot receive a new recovery capsule
+SOURCE_PACKAGE_ID=389ee7adf608d69446d7afb5b2d9f61ba47af13b88b56f57e92ebbf141c6aaae
+RECOVERY_CAPSULE_ID=629b501aefe4ffc015d65b2a36ee208aa551d4bef180eafb3b7ac526aff8b990
+RECOVERED_HEAD=202ace5e7d482fb23914069398db94a425f752c5ccafb7da96c7fe84df4547c2
+ALL R20 CROSS-DEVICE RECOVERY CHECKS PASS

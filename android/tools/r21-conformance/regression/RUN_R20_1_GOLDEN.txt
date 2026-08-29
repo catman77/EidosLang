@@ -1,0 +1,7 @@
+PASS fixed R20.1 identity bundles
+PASS fixed R20.1 signed prekey bundle
+PASS fixed R20.1 initial session signature/session binding
+PASS fixed R20.1 P-256 DH ratchet response decryption
+PASS fixed R20.1 out-of-order skipped-key consumption and erasure
+PASS fixed R20.1 canonical secret-state vector
+ALL R20.1 FIXED GOLDEN CHECKS PASS

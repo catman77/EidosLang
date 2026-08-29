@@ -1,0 +1,4 @@
+R15 dynamic checks: 11 PASS
+R15 fixed golden checks: 7 PASS
+R14.1 regression under R15: 13 PASS
+Android build: NOT RUN (no Android SDK/emulator)

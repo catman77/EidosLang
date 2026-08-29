@@ -1,0 +1,3 @@
+mnt/data/eidolang_android_r21/tools/r21-conformance/R21Main.kt:80:9: warning: variable 'freshOld' is never used
+    val freshOld=HistoryVaultRecoveryCoordinator(freshOldRepo,alice2,random)
+        ^

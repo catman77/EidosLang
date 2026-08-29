@@ -1,0 +1,66 @@
+{
+  "stage": "R19",
+  "status": "SOURCE_COMPLETE_PURE_KOTLIN_DESTRUCTIVE_RECOVERY_PASS",
+  "executed_pass_count": 64,
+  "pass_counts": {
+    "r19_dynamic": 12,
+    "r19_fixed": 3,
+    "r18": 14,
+    "r17": 5,
+    "r16": 5,
+    "bep52": 2,
+    "bep44": 3,
+    "r15": 7,
+    "r14": 13
+  },
+  "r19_dynamic_checks": [
+    "PASS first R18 history chunk archived as verified R16 segment",
+    "PASS complete archive export refuses locally committed but unarchived messages",
+    "PASS incremental archive emits only unarchived messages and advances segment lineage",
+    "PASS archive pin state is independent of immutable R16 segment identity",
+    "PASS full archive package canonical round-trip excludes private key material",
+    "PASS delete-local-state model restores contacts/conversations/messages/timeline, including empty local state",
+    "PASS exact archive package replay is idempotent",
+    "PASS verified R16 segments alone reconstruct exact cryptographic message DAG and eidograms",
+    "PASS deterministic overlapping-segment recovery deduplicates repeated messages",
+    "PASS same MessageId/body with refreshed valid ECDSA proof is an idempotent duplicate",
+    "PASS corrupt archive package is rejected before repository/archive mutation",
+    "PASS R19 package refuses restore on a device lacking the bound historical decryption key"
+  ],
+  "fixed_package": {
+    "package_id": "4c2e86bc96783a8f49f23f5dbd660b29b38cc2cc07f9ee7c6ea0f3973158e36b",
+    "sha256": "6c34119bf839680caef13812801110e12ba067aa3a0cf414c8763460e19d1eed",
+    "segment_id": "78aa678b7004e0acb800bcc0732d39c41028db776da51cbc0018e22e8af0d25b",
+    "torrent_infohash_v2": "d53c6a8c2d521374d8cf38d025b5dfa273c59b3df75d44f26d7a495340d45129"
+  },
+  "dynamic_sample": {
+    "segment_1": "831ffb9d815be645025e34325f0cf147cf891ffbc5717992dc13dc4514ba68b4",
+    "segment_2": "29e08ba6bb29cada7748c818edaa29e09ed4d9cd42f69fc042b9745bfa0c476c",
+    "package_id": "1477502df34327079163da88f1458cd1d589c74d8c74c51052a9dc2c00aacbbb",
+    "primary_head": "809ba0e367a38a9b5617045f9d510e0c126053fd54dfe0fdbad7655732289ed4"
+  },
+  "implemented": [
+    "incremental R18-to-R16 segment creation",
+    "persistent archive-store API and Android file implementation",
+    "pin/unpin local metadata",
+    "canonical EidoArchivePackageV1",
+    "complete contact/conversation recovery metadata including empty conversations",
+    "fail-closed complete export",
+    "transactional restore preflight",
+    "overlapping segment deduplication",
+    "segment-only cryptographic recovery",
+    "same-device/key recovery binding",
+    "archive browser UI"
+  ],
+  "corrections": [
+    "MessageId identifies encrypted body; randomized ECDSA signature bytes are proof, not message identity"
+  ],
+  "security_boundary": {
+    "private_keys_in_package": false,
+    "same_device_key_required": true,
+    "different_device_restore": "R20_REQUIRED"
+  },
+  "android_runtime_executed": false,
+  "real_network_executed": false,
+  "next_stage": "R20 Multi-device"
+}

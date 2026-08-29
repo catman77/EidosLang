@@ -1,0 +1,46 @@
+{
+  "stage": "R17",
+  "status": "SOURCE_COMPLETE_REFERENCE_TWO_NODE_ADMISSION_PASS_NATIVE_NETWORK_UNRESOLVED",
+  "transport_gate": "NetworkDownloaded AND R16Verify=PASS => RepositoryAccepted",
+  "dependency_pin": {
+    "libtorrent": "2.1.1",
+    "workmanager": "2.11.2"
+  },
+  "implemented": [
+    "core transport contract",
+    "reference two-node network",
+    "mandatory R16 post-download admission",
+    "BEP44 monotonic reference store",
+    "WorkManager periodic head-refresh policy",
+    "JNI/CMake libtorrent integration surface",
+    "Android INTERNET and network-state permissions"
+  ],
+  "native_backend": {
+    "android_ndk_build_executed": false,
+    "real_bittorrent_swarm_executed": false,
+    "real_public_dht_executed": false,
+    "bep44_native_put": "FAIL_CLOSED_UNTIL_R17_1",
+    "reason": "Android SDK/NDK and libtorrent source/binary are unavailable in the artifact environment"
+  },
+  "pass_counts": {
+    "r17_reference": 5,
+    "r16_dynamic": 10,
+    "r16_fixed": 5,
+    "r16_py_bep52": 2,
+    "r16_py_bep44": 3,
+    "r15_fixed": 7,
+    "r14_1": 13
+  },
+  "pass_total": 45,
+  "source_sha256": {
+    "core-transport/src/main/java/org/eidolang/core/transport/Transport.kt": "52ab0b9504ff69eea327f777d124c980b3b18890c7ade8fba4a1037c1643280e",
+    "core-transport/src/main/java/org/eidolang/core/transport/Admission.kt": "337a55d42d855a348f54008f1891387506b7d5fca0c1ff8d80db2c861fd5f43d",
+    "core-transport/src/main/java/org/eidolang/core/transport/ReferenceNetwork.kt": "d36dd17d67ac02e741d9ad25728c2d8dc66eabe5a76f24ef4cbfe27919636233",
+    "core-archive/src/main/java/org/eidolang/core/archive/ConversationHead.kt": "f82a33bcde23782311b028214bd5d618f7ca6dda0020cd664947488ec0a6d5a8",
+    "feature-sync/src/main/java/org/eidolang/feature/sync/SyncPolicy.kt": "f5b05d9fab0fb6f9b8ca18653e1b4aa219996e5feea7024717e8b46ea5832e56",
+    "native-torrent/src/main/java/org/eidolang/native/torrent/LibtorrentNative.kt": "405ed777925ab5ad2f87b063e9c235af000eb09b78e01591da4e4787949e42cf",
+    "native-torrent/src/main/cpp/eidolang_libtorrent_jni.cpp": "c9afc02cfa26b9e219ab139abb619a5d4b72aaf242716c69bf7d04e7aa83c0f2",
+    "native-torrent/src/main/cpp/CMakeLists.txt": "3e74aaf6b2ebb51ed9b9f7cfb6b4317fa5a3ec0206e3e4893b4fb764d09eefb1"
+  },
+  "next_stage": "R17.1 Android NDK/libtorrent native network admission, then R18 repository + messenger UX"
+}

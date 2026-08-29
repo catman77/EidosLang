@@ -1,0 +1,18 @@
+R20.1 dynamic forward-session: 11 PASS
+R20.1 fixed golden: 6 PASS
+R20.1 independent Python: 3 PASS
+R20 multi-device regression: 11 PASS
+R20 cross-device recovery regression: 9 PASS
+R20 fixed golden regression: 6 PASS
+R19 dynamic regression: 12 PASS
+R19 fixed package regression: 3 PASS
+R18 regression: 14 PASS
+R17 reference admission regression: 5 PASS
+R16 fixed golden regression: 5 PASS
+R16 Python BEP52: 2 PASS
+R16 Python BEP44: 3 PASS
+R15 fixed crypto regression: 7 PASS
+R14.1 canonical/editor regression: 13 PASS
+TOTAL EXECUTED: 110 PASS
+Android Gradle/Keystore runtime: NOT RUN
+Real network execution: NOT RUN / intentionally non-blocking
