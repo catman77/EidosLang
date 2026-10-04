@@ -25,7 +25,6 @@ jobs:
     runs-on: [self-hosted, Linux, X64, '${{ inputs.runner_label }}']
     timeout-minutes: 30
     env:
-      TMPDIR: ${{ runner.temp }}
       RELEASE_TAG: ${{ inputs.release_tag }}
     steps:
       - uses: actions/checkout@v4
@@ -36,6 +35,8 @@ jobs:
       # The runner provides JDK 21, Android SDK 37 and Gradle 9.5.0.
       - name: Unit tests and APK build
         working-directory: android
+        env:
+          TMPDIR: ${{ runner.temp }}
         run: gradle :core-model:testDebugUnitTest :core-canonical:testDebugUnitTest :app:assembleDebug --no-daemon -Djava.io.tmpdir="$TMPDIR"
 
       - name: Publish versioned APK
