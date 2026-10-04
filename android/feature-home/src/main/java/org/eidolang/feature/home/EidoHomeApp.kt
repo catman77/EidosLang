@@ -23,8 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.eidolang.core.crypto.DevicePrivateCrypto
-import org.eidolang.core.hardening.AndroidRepositoryTextProtector
-import org.eidolang.core.repository.AndroidSqliteMessengerRepository
+import org.eidolang.core.hardening.AndroidMessengerRepositoryProvider
 import org.eidolang.core.repository.ContactSummary
 import org.eidolang.core.repository.LocalMessengerService
 import kotlinx.coroutines.Dispatchers
@@ -81,7 +80,7 @@ fun EidoHomeApp(
 
     val service = remember {
         LocalMessengerService(
-            AndroidSqliteMessengerRepository(context, AndroidRepositoryTextProtector(context)),
+            AndroidMessengerRepositoryProvider.get(context),
             identity, SecureRandom(),
         )
     }

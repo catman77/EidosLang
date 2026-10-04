@@ -26,7 +26,8 @@ private fun restore(
 )
 
 private fun largeDocument(): EidogramDocumentV1 {
-    val glyphs = EidoGlyphCatalogV1.glyphs
+    // Exercise newly added glyphs in encrypted archives as well as the original catalogue.
+    val glyphs = EidoGlyphCatalogV1.family(GlyphFamily.COLORED_SQUARE) + EidoGlyphCatalogV1.glyphs
     val actions = (0 until 220).map { i ->
         val x = 40_000 + (i % 20) * 46_000
         val y = 60_000 + (i / 20) * 78_000
@@ -59,8 +60,8 @@ fun main(args: Array<String>) {
     val bob = restore(bobBundle, GoldenR15.BOB_ROOT_PRIVATE_B64, GoldenR15.BOB_SIGN_PRIVATE_B64, GoldenR15.BOB_ENC_PRIVATE_B64)
 
     val first = MessageCrypto.seal(
-        largeDocument(), conversation, alice,
-        listOf(MessageCrypto.recipient(bob.certificate)),
+        document = largeDocument(), conversation = conversation, sender = alice,
+        recipients = listOf(MessageCrypto.recipient(bob.certificate)),
         senderSeq = 101,
         createdAtMs = 1_786_410_000_000L,
         random = random,
@@ -69,8 +70,8 @@ fun main(args: Array<String>) {
     check(firstJson.toByteArray().size > TorrentV2Builder.BLOCK_SIZE)
 
     val second = MessageCrypto.seal(
-        replyDocument(), conversation, bob,
-        listOf(MessageCrypto.recipient(alice.certificate)),
+        document = replyDocument(), conversation = conversation, sender = bob,
+        recipients = listOf(MessageCrypto.recipient(alice.certificate)),
         senderSeq = 77,
         createdAtMs = 1_786_410_010_000L,
         parentMessageIds = listOf(first.messageId),
@@ -113,6 +114,15 @@ fun main(args: Array<String>) {
     )
     check(loaded.manifest == segment.manifest)
     println("PASS downloaded-file reconstruction and cryptographic verification")
+
+    val firstEntry = loaded.manifest.messageEntries.single { it.messageId == first.messageId }
+    val archived = MessageParser.parseCanonical(
+        loaded.files.single { it.path == firstEntry.path }.bytes.toString(Charsets.UTF_8)
+    )
+    val restored = MessageCrypto.open(archived, alice.user, alice.certificate, bob, conversation)
+    check(restored == largeDocument())
+    check(EidogramReplay.replay(restored).instances.any { it.glyphId.startsWith("square.") })
+    println("PASS coloured squares survive encrypted message and archive round-trip")
 
     val tamperedFiles = segment.files.map { f ->
         if (f.path == segment.manifest.messageEntries.first().path) {

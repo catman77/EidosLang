@@ -1,6 +1,6 @@
 package org.eidolang.core.model
 
-enum class GlyphFamily { COLORED_CIRCLE, COLORED_TRIANGLE, BLACK_DOT, BLACK_STICK, BLACK_OUTLINE }
+enum class GlyphFamily { COLORED_CIRCLE, COLORED_TRIANGLE, COLORED_SQUARE, BLACK_DOT, BLACK_STICK, BLACK_OUTLINE }
 
 data class PaletteEntry(val index: Int, val name: String, val hexSrgb: String)
 
@@ -8,6 +8,7 @@ sealed interface GlyphRenderSpec {
     data class FilledCircle(val diameterFp: Int, val paletteIndex: Int) : GlyphRenderSpec
     /** Solid triangle, offered in the same colours and sizes as the circles. */
     data class FilledTriangle(val bboxWFp: Int, val bboxHFp: Int, val paletteIndex: Int) : GlyphRenderSpec
+    data class FilledSquare(val edgeFp: Int, val paletteIndex: Int) : GlyphRenderSpec
     data class Capsule(
         val lengthFp: Int,
         val thicknessFp: Int,
@@ -117,6 +118,15 @@ object EidoGlyphCatalogV1 {
                 GlyphRenderSpec.BlackOutline(shape, dims.first, dims.second, 9_000, 9),
             ))
         }
+        palette.forEach { color ->
+            circleDiameters.forEach { (size, edge) ->
+                add(GlyphDefinition(
+                    "square.${color.name}.$size",
+                    GlyphFamily.COLORED_SQUARE,
+                    GlyphRenderSpec.FilledSquare(edge, color.index),
+                ))
+            }
+        }
     }
 
     /**
@@ -133,6 +143,7 @@ object EidoGlyphCatalogV1 {
             val spec = when (val r = g.render) {
                 is GlyphRenderSpec.FilledCircle -> "circle:${r.diameterFp}:${r.paletteIndex}"
                 is GlyphRenderSpec.FilledTriangle -> "triangle:${r.bboxWFp}:${r.bboxHFp}:${r.paletteIndex}"
+                is GlyphRenderSpec.FilledSquare -> "square:${r.edgeFp}:${r.paletteIndex}"
                 is GlyphRenderSpec.Capsule ->
                     "capsule:${r.lengthFp}:${r.thicknessFp}:${r.baseOrientationMdeg}:${r.paletteIndex}"
                 is GlyphRenderSpec.BlackOutline ->

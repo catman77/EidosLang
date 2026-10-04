@@ -1,14 +1,44 @@
 package org.eidolang.feature.editor
 
 import android.content.Context
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import org.eidolang.core.canonical.EidogramCanonical
 import org.eidolang.core.canonical.EidogramParser
 import org.eidolang.core.hardening.AndroidLocalSecretBox
 import org.eidolang.core.model.EditorDraft
 import org.eidolang.core.model.EditorDraftFactory
 import java.security.MessageDigest
+import java.util.concurrent.Executors
 
 object DraftStore {
+    // One queue for all editor instances: save, clear and a subsequent load must stay ordered.
+    // This scope outlives a screen so navigating away cannot cancel its final encrypted write.
+    private val dispatcher = Executors.newSingleThreadExecutor { task ->
+        Thread(task, "eidogram-drafts").apply { isDaemon = true }
+    }.asCoroutineDispatcher()
+    private val scope = CoroutineScope(SupervisorJob() + dispatcher)
+
+    suspend fun loadInBackground(context: Context, key: String): Result<EditorDraft> =
+        withContext(dispatcher) { load(context.applicationContext, key) }
+
+    fun saveInBackground(context: Context, draft: EditorDraft, key: String): Deferred<Result<Unit>> {
+        val app = context.applicationContext
+        // Only actions are persisted. A slow Keystore must not keep the closed screen's entire
+        // undo/redo history alive through every queued write.
+        val persisted = EditorDraft(actions = draft.actions)
+        return scope.async { save(app, persisted, key) }
+    }
+
+    fun clearInBackground(context: Context, key: String): Deferred<Unit> {
+        val app = context.applicationContext
+        return scope.async { clear(app, key) }
+    }
+
     private fun fileName(key: String): String {
         val h = MessageDigest.getInstance("SHA-256")
             .digest(key.toByteArray(Charsets.UTF_8))

@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
-import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -62,12 +62,20 @@ fun EidoEditorScreen(
     sendDisabledReason: String? = null,
 ) {
     val context = LocalContext.current
-    var draft by remember(draftKey) {
-        mutableStateOf(
-            DraftStore.load(context, draftKey).getOrNull()
-                ?: initialDocument?.let { EditorDraftFactory.fromDocument(it) }
-                ?: EditorDraft()
-        )
+    val scope = rememberCoroutineScope()
+    var draft by remember(draftKey) { mutableStateOf(EditorDraft()) }
+    var loaded by remember(draftKey) { mutableStateOf(false) }
+    LaunchedEffect(draftKey) {
+        draft = DraftStore.loadInBackground(context, draftKey).getOrNull()
+            ?: initialDocument?.let { EditorDraftFactory.fromDocument(it) }
+            ?: EditorDraft()
+        loaded = true
+    }
+    if (!loaded) {
+        Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+        return
     }
     var multiSelect by remember { mutableStateOf(false) }
     // The glyph the next tap on empty canvas will place. Without it every figure landed in the
@@ -78,22 +86,41 @@ fun EidoEditorScreen(
     // before it starts appearing.
     var pen by remember { mutableStateOf("") }
     var status by remember { mutableStateOf<String?>(null) }
+    var gestureBase by remember(draftKey) {
+        mutableStateOf<Pair<List<EidogramAction>, List<List<EidogramAction>>>?>(null)
+    }
 
-    val snapshot = draft.snapshot
+    val snapshot = remember(draft.actions) { draft.snapshot }
     // Read by the long-lived gesture handler so it never has to be rebuilt on every edit.
     val liveSnapshot = rememberUpdatedState(snapshot)
     val liveSelection = rememberUpdatedState(draft.selectedIds)
 
-    fun setDraft(next: EditorDraft, persist: Boolean = true) {
-        draft = next
-        if (persist) {
-            DraftStore.save(context, next, draftKey).onFailure {
+    fun persistDraft(next: EditorDraft) {
+        val pending = DraftStore.saveInBackground(context, next, draftKey)
+        scope.launch {
+            pending.await().onFailure {
                 status = "Ошибка сохранения черновика: ${it.message}"
             }
         }
     }
 
-    fun command(c: EditorCommand) = setDraft(EditorReducer.reduce(draft, c))
+    fun setDraft(next: EditorDraft) {
+        val previous = draft
+        draft = next
+        // Selection is not part of the saved document. A moving pointer only updates memory;
+        // serialising and encrypting the entire history on every event used to block the UI.
+        if (gestureBase == null && previous.actions !== next.actions) {
+            persistDraft(next)
+        }
+    }
+
+    DisposableEffect(draftKey) {
+        onDispose {
+            if (gestureBase != null) DraftStore.saveInBackground(context, draft, draftKey)
+        }
+    }
+
+    fun command(c: EditorCommand) = setDraft(EditorReducer.reduce(draft, c, recordUndo = gestureBase == null))
 
     val liveCommand = rememberUpdatedState<(EditorCommand) -> Unit> { c -> command(c) }
     val liveMulti = rememberUpdatedState(multiSelect)
@@ -116,24 +143,24 @@ fun EidoEditorScreen(
     // a line was the pen, and a tap that wandered a few pixels left a stub behind.
     var lineMode by remember { mutableStateOf(false) }
     val liveLineMode = rememberUpdatedState(lineMode)
-    val liveDraft = rememberUpdatedState(draft)
     /**
      * Collapse one continuous gesture into one undo step.
      *
-     * The reducer pushes an undo entry per mutation, and a drag mutates on every pointer event, so
-     * without this "Отменить" walks back a drag one frame at a time and a single drag can bury
-     * everything before it under a hundred entries. Capture the state the gesture started from, then
-     * rewrite the stack once when the finger lifts.
+     * A drag mutates on every pointer event. Capture the initial state and suppress intermediate
+     * undo entries, then commit one entry when the finger lifts. Besides making one Undo reverse
+     * one gesture, this avoids retaining full action-list copies for all its pointer frames.
      */
-    var gestureBase by remember { mutableStateOf<Pair<List<EidogramAction>, List<List<EidogramAction>>>?>(null) }
     val liveGestureBegin = rememberUpdatedState<() -> Unit> {
-        if (gestureBase == null) gestureBase = liveDraft.value.actions to liveDraft.value.undo
+        if (gestureBase == null) gestureBase = draft.actions to draft.undo
     }
     val liveGestureEnd = rememberUpdatedState<() -> Unit> {
         val base = gestureBase
         gestureBase = null
-        if (base != null && base.first !== liveDraft.value.actions) {
-            setDraft(liveDraft.value.copy(undo = base.second + listOf(base.first), redo = emptyList()))
+        // Read the state directly: multiple pointer events can arrive before recomposition
+        // updates a rememberUpdatedState holder, including the final event of a drag.
+        if (base != null && base.first !== draft.actions) {
+            draft = draft.copy(undo = base.second + listOf(base.first), redo = emptyList())
+            persistDraft(draft)
         }
     }
     // The line being dragged out right now. Not part of the document until the finger lifts.
@@ -218,7 +245,8 @@ fun EidoEditorScreen(
                                     runCatching { onSend(draft.document) }
                                         .onSuccess { accepted ->
                                             if (accepted) {
-                                                DraftStore.clear(context, draftKey)
+                                                gestureBase = null
+                                                DraftStore.clearInBackground(context, draftKey)
                                                 draft = EditorDraft()
                                                 status = "Сообщение сохранено"
                                                 onClose?.invoke()

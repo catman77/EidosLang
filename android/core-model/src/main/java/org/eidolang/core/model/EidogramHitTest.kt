@@ -70,6 +70,10 @@ object EidogramHitTest {
                     ly >= -hh - localSlop && ly <= hh + localSlop &&
                     abs(lx) <= hw * (ly + hh) / (2 * hh) + localSlop)
             }
+            is GlyphRenderSpec.FilledSquare -> {
+                val halfEdge = r.edgeFp / 2.0 + localSlop
+                abs(lx) <= halfEdge && abs(ly) <= halfEdge
+            }
             is GlyphRenderSpec.Capsule -> {
                 // Undo the glyph's discrete base pose as well.
                 val p = -Math.toRadians(r.baseOrientationMdeg / 1000.0)

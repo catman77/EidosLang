@@ -39,7 +39,7 @@ jobs:
 
       - name: Unit tests
         working-directory: android
-        run: gradle :core-model:testDebugUnitTest --no-daemon
+        run: gradle :core-model:testDebugUnitTest :core-canonical:testDebugUnitTest --no-daemon
 
       - name: Build debug APK
         working-directory: android

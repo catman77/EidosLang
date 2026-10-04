@@ -40,12 +40,14 @@ sealed interface EditorCommand {
 }
 
 object EditorReducer {
-    private fun withMutation(d: EditorDraft, newActions: List<EidogramAction>, selected: Set<String> = d.selectedIds, nextInstance: Int = d.nextInstanceNumber, nextGroup: Int = d.nextGroupNumber): EditorDraft =
-        d.copy(actions = newActions, selectedIds = selected, nextInstanceNumber = nextInstance, nextGroupNumber = nextGroup, undo = d.undo + listOf(d.actions), redo = emptyList())
+    private fun withMutation(d: EditorDraft, newActions: List<EidogramAction>, selected: Set<String> = d.selectedIds, nextInstance: Int = d.nextInstanceNumber, nextGroup: Int = d.nextGroupNumber, recordUndo: Boolean = true): EditorDraft =
+        d.copy(actions = newActions, selectedIds = selected, nextInstanceNumber = nextInstance, nextGroupNumber = nextGroup, undo = if (recordUndo) d.undo + listOf(d.actions) else d.undo, redo = emptyList())
 
     private fun nextSeq(actions: List<EidogramAction>) = actions.size
 
-    fun reduce(d: EditorDraft, c: EditorCommand): EditorDraft = when (c) {
+    // A continuous gesture records its initial state once in the editor. Keeping every pointer
+    // frame here retains copies of all preceding action lists until the finger lifts: O(n²).
+    fun reduce(d: EditorDraft, c: EditorCommand, recordUndo: Boolean = true): EditorDraft = when (c) {
         is EditorCommand.Select -> d.copy(selectedIds = c.ids)
         is EditorCommand.AddGlyph -> {
             EidoGlyphCatalogV1.requireGlyph(c.glyphId)
@@ -56,37 +58,37 @@ object EditorReducer {
                 FixedTransform(c.cxFp, c.cyFp, scaleXFp = c.scaleXFp, rotationMdeg = c.rotationMdeg),
                 z,
             )
-            withMutation(d, d.actions + a, setOf(id), nextInstance = d.nextInstanceNumber + 1)
+            withMutation(d, d.actions + a, setOf(id), nextInstance = d.nextInstanceNumber + 1, recordUndo = recordUndo)
         }
-        is EditorCommand.TranslateSelected -> transformEach(d) { t -> t.copy(cxFp = t.cxFp + c.dxFp, cyFp = t.cyFp + c.dyFp) }
-        is EditorCommand.ScaleSelected -> scaleSelected(d, c.multiplierFp)
-        is EditorCommand.RotateSelected -> transformEach(d) { t -> t.copy(rotationMdeg = normalizeRotation(t.rotationMdeg + c.deltaMdeg)) }
+        is EditorCommand.TranslateSelected -> transformEach(d, recordUndo) { t -> t.copy(cxFp = t.cxFp + c.dxFp, cyFp = t.cyFp + c.dyFp) }
+        is EditorCommand.ScaleSelected -> scaleSelected(d, c.multiplierFp, recordUndo)
+        is EditorCommand.RotateSelected -> transformEach(d, recordUndo) { t -> t.copy(rotationMdeg = normalizeRotation(t.rotationMdeg + c.deltaMdeg)) }
         is EditorCommand.SetGlyphSelected -> {
             EidoGlyphCatalogV1.requireGlyph(c.glyphId)
             if (d.selectedIds.isEmpty()) d else {
                 var actions = d.actions
                 d.selectedIds.sorted().forEach { id -> actions = actions + EidogramAction.SetGlyph(actions.size, id, c.glyphId) }
-                withMutation(d, actions)
+                withMutation(d, actions, recordUndo = recordUndo)
             }
         }
-        EditorCommand.BringForward -> moveZ(d, +1)
-        EditorCommand.SendBackward -> moveZ(d, -1)
+        EditorCommand.BringForward -> moveZ(d, +1, recordUndo)
+        EditorCommand.SendBackward -> moveZ(d, -1, recordUndo)
         EditorCommand.DeleteSelected -> if (d.selectedIds.isEmpty()) d else {
             var actions = d.actions
             d.selectedIds.sorted().forEach { id -> actions = actions + EidogramAction.Remove(actions.size, id) }
-            withMutation(d, actions, emptySet())
+            withMutation(d, actions, emptySet(), recordUndo = recordUndo)
         }
         EditorCommand.GroupSelected -> if (d.selectedIds.size < 2) d else {
             val gid = "grp" + d.nextGroupNumber.toString().padStart(6, '0')
             val a = EidogramAction.Group(nextSeq(d.actions), gid, d.selectedIds.sorted())
-            withMutation(d, d.actions + a, nextGroup = d.nextGroupNumber + 1)
+            withMutation(d, d.actions + a, nextGroup = d.nextGroupNumber + 1, recordUndo = recordUndo)
         }
         EditorCommand.UngroupSelected -> {
             val groups = d.snapshot.instances.filter { it.instanceId in d.selectedIds }.mapNotNull { it.groupId }.toSet()
             if (groups.isEmpty()) d else {
                 var actions = d.actions
                 groups.sorted().forEach { gid -> actions = actions + EidogramAction.Ungroup(actions.size, gid) }
-                withMutation(d, actions)
+                withMutation(d, actions, recordUndo = recordUndo)
             }
         }
         EditorCommand.Undo -> if (d.undo.isEmpty()) d else d.copy(actions = d.undo.last(), undo = d.undo.dropLast(1), redo = d.redo + listOf(d.actions), selectedIds = emptySet())
@@ -107,7 +109,7 @@ object EditorReducer {
      * length genuinely is the X axis. That is the same normalisation a dragged line is born with,
      * which is why dragged lines never showed this and placed ones did.
      */
-    private fun scaleSelected(d: EditorDraft, multiplierFp: Int): EditorDraft {
+    private fun scaleSelected(d: EditorDraft, multiplierFp: Int, recordUndo: Boolean): EditorDraft {
         if (d.selectedIds.isEmpty()) return d
         val byId = d.snapshot.instances.associateBy { it.instanceId }
         var actions = d.actions
@@ -131,7 +133,7 @@ object EditorReducer {
             }
             actions = actions + EidogramAction.SetTransform(actions.size, id, t)
         }
-        return withMutation(d, actions)
+        return withMutation(d, actions, recordUndo = recordUndo)
     }
 
     private fun mul(v: Int, multiplierFp: Int): Int =
@@ -145,7 +147,7 @@ object EditorReducer {
         return flat.takeIf { id -> EidoGlyphCatalogV1.glyphs.any { it.glyphId == id } }
     }
 
-    private fun transformEach(d: EditorDraft, f: (FixedTransform) -> FixedTransform): EditorDraft {
+    private fun transformEach(d: EditorDraft, recordUndo: Boolean, f: (FixedTransform) -> FixedTransform): EditorDraft {
         if (d.selectedIds.isEmpty()) return d
         val byId = d.snapshot.instances.associateBy { it.instanceId }
         var actions = d.actions
@@ -153,10 +155,10 @@ object EditorReducer {
             val old = byId[id] ?: return@forEach
             actions = actions + EidogramAction.SetTransform(actions.size, id, f(old.transform))
         }
-        return withMutation(d, actions)
+        return withMutation(d, actions, recordUndo = recordUndo)
     }
 
-    private fun moveZ(d: EditorDraft, delta: Int): EditorDraft {
+    private fun moveZ(d: EditorDraft, delta: Int, recordUndo: Boolean): EditorDraft {
         if (d.selectedIds.isEmpty()) return d
         val byId = d.snapshot.instances.associateBy { it.instanceId }
         var actions = d.actions
@@ -164,7 +166,7 @@ object EditorReducer {
             val old = byId[id] ?: return@forEach
             actions = actions + EidogramAction.MoveZ(actions.size, id, old.zIndex + delta)
         }
-        return withMutation(d, actions)
+        return withMutation(d, actions, recordUndo = recordUndo)
     }
 
     private fun normalizeRotation(v: Int): Int {

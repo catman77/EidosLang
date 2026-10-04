@@ -11,8 +11,8 @@ android {
         applicationId = "org.eidolang.app"
         minSdk = 26
         targetSdk = 37
-        versionCode = 1
-        versionName = "0.1-R22"
+        versionCode = 2
+        versionName = "0.1-R22.1"
         // Two-device enrollment is driven by tools/two-device-enrollment.sh, not by this suite.
         testInstrumentationRunnerArguments["notAnnotation"] =
             "org.eidolang.app.TwoDeviceOnly,org.eidolang.app.NativeSessionHeavy"

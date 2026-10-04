@@ -6,6 +6,7 @@ import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.geometry.Offset
 import org.eidolang.core.model.EditorCommand
@@ -94,7 +95,9 @@ class EditorOverlapAndLineScaleTest {
             "overlaptest",
         )
         rule.setContent { EidoEditorScreen(draftKey = "overlaptest") }
-        rule.waitForIdle()
+        rule.waitUntil(5_000) {
+            rule.onAllNodesWithTag("eidogramCanvas").fetchSemanticsNodes().isNotEmpty()
+        }
 
         val canvas = rule.onNodeWithTag("eidogramCanvas")
 
@@ -116,6 +119,7 @@ class EditorOverlapAndLineScaleTest {
         canvas.performTouchInput { longClick(Offset(centerX, centerY)) }
         rule.waitForIdle()
 
+        rule.waitUntil(5_000) { countInstances("overlaptest") == 2 }
         assertEquals("вторая фигура не поставилась поверх первой", 2, countInstances("overlaptest"))
         println("EDITOR PASS a long press places a second glyph on the same spot")
 

@@ -11,7 +11,7 @@ object ProtocolLineage {
      */
     const val GLYPH_CATALOG_ID = "EidoGlyphCatalogV1"
     /** Derived from the catalogue's contents; `CatalogTest` fails if the two drift apart. */
-    const val GLYPH_CATALOG_HASH = "f5fef90fd3dc9fd58227b30e5b1d66e0004d385e42f0026a452ee2857f18d10d"
+    const val GLYPH_CATALOG_HASH = "363f96f2573791fecb584e2b10909599d38a9e0d4437893b66eae802f90931bb"
     const val DOCUMENT_TYPE = "EidogramDocumentV1"
     const val DOCUMENT_VERSION = "1.1.0"
     const val FIXED_POINT_ONE = 1_000_000

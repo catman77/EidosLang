@@ -543,10 +543,12 @@ Invariants enforced by the conformance suites — violating any of these breaks 
 
 - **Canonical round-trip is byte-exact.** No float exponents, no duplicate keys, no extra fields,
   fixed field ordering. Non-canonical input is `INVALID`, never a warning.
-- **Frozen ids, growing catalogue.** `EidoGlyphCatalogV1` now holds 791 glyphs — sticks gained the
+- **Frozen ids, growing catalogue.** `EidoGlyphCatalogV1` now holds 821 glyphs — filled squares share
+  the circles' and triangles' 10 colours and 3 sizes; sticks have the
   full palette (10 colours x 8 poses x 3 lengths x 3 thicknesses = 720), and every id it ever
   shipped is still present and unchanged. `catalog_hash` is therefore
-  `f5fef90fd3dc9fd58227b30e5b1d66e0004d385e42f0026a452ee2857f18d10d`, was
+  `363f96f2573791fecb584e2b10909599d38a9e0d4437893b66eae802f90931bb`, was
+  `f5fef90fd3dc9fd58227b30e5b1d66e0004d385e42f0026a452ee2857f18d10d`, and originally
   `da2d3b72ff8d41abb8c293ce1deca44e99cb1d1a696e9834997395c6f6218005`, and is now **derived** from
   the catalogue's contents by `EidoGlyphCatalogV1.contentHash()` rather than maintained by hand —
   `CatalogTest` fails if the two drift.

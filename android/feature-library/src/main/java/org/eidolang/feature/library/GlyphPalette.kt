@@ -13,23 +13,18 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import org.eidolang.core.model.EidoGlyphCatalogV1
 import org.eidolang.core.model.GlyphFamily
 import org.eidolang.core.render.GlyphPreview
 
 /**
- * Choosing a glyph along the axes it actually has, instead of scrolling 113 thumbnails.
+ * Choosing a glyph along its colour, size or thickness instead of scrolling a flat catalogue.
  *
- * `EidoGlyphCatalogV1` is frozen and structured: 10 colours x 3 sizes of circle, 3 dot sizes,
- * 8 slopes x 3 lengths x 3 thicknesses of line, 8 outlines. A flat list hides that structure and
- * makes picking a specific line hopeless — there are 72 of them. Here each axis is its own control,
+ * Circles, triangles and squares share 10 colours and 3 sizes. Here each axis is its own control,
  * and the result is the "pen" the next tap on the canvas places. Slope is the one axis with no
  * control: the editor draws a line between two points, so the gesture sets the angle.
- *
- * Colour is offered only where the frozen catalogue has it: circles. Lines, dots and outlines are
- * black by definition of the catalogue, and giving them colours would change `catalog_hash` and
- * invalidate every existing eidogram.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,7 +40,10 @@ fun GlyphPalette(
         // A scrolling row, not a segmented button: the catalogue gains families over time and a
         // fixed row wrapped "Контуры" onto two lines on top of its neighbour as soon as a fifth
         // one appeared.
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        LazyRow(
+            modifier = Modifier.testTag("glyphFamilies"),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
             // Turning placement off belongs here, next to the thing being turned off, and not in
             // the toolbar: nine controls at 36dp already fill that row on a 393dp screen, and a
             // tenth wraps it onto a second line at the permanent cost of canvas height.
@@ -68,6 +66,7 @@ fun GlyphPalette(
                             when (f) {
                                 GlyphFamily.COLORED_CIRCLE -> "Круги"
                                 GlyphFamily.COLORED_TRIANGLE -> "Треугольники"
+                                GlyphFamily.COLORED_SQUARE -> "Квадраты"
                                 GlyphFamily.BLACK_DOT -> "Точки"
                                 GlyphFamily.BLACK_STICK -> "Линии"
                                 GlyphFamily.BLACK_OUTLINE -> "Контуры"
@@ -91,6 +90,7 @@ fun GlyphPalette(
             )
             GlyphFamily.COLORED_CIRCLE -> ShapeControls("circle", CIRCLE_COLOURS, CIRCLE_SIZES, pen, onPen)
             GlyphFamily.COLORED_TRIANGLE -> ShapeControls("triangle", TRIANGLE_COLOURS, TRIANGLE_SIZES, pen, onPen)
+            GlyphFamily.COLORED_SQUARE -> ShapeControls("square", SQUARE_COLOURS, SQUARE_SIZES, pen, onPen)
             GlyphFamily.BLACK_DOT -> SizeRow("Размер", DOT_SIZES, sizeOf(pen)) { onPen("dot.black.$it") }
             GlyphFamily.BLACK_STICK -> StickControls(pen, onPen)
             GlyphFamily.BLACK_OUTLINE -> OutlineRow(pen, onPen)
@@ -111,12 +111,16 @@ private fun ShapeControls(
     val colour = pen.split('.').getOrElse(1) { colours.first() }
     val size = pen.substringAfterLast('.').takeIf { it in sizes } ?: sizes[sizes.size / 2]
     Column {
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        LazyRow(
+            modifier = Modifier.testTag("glyphColours"),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             items(colours) { name ->
                 val swatch = swatchOf("$prefix.$name.l")
                 Box(
                     Modifier
                         .size(38.dp)
+                        .testTag("glyphColour-$prefix-$name")
                         .clip(CircleShape)
                         .background(swatch)
                         .border(
@@ -226,6 +230,7 @@ private fun humanSize(code: String) = when (code) {
 private fun familyOf(pen: String): GlyphFamily? = when (pen.substringBefore('.')) {
     "" -> null
     "triangle" -> GlyphFamily.COLORED_TRIANGLE
+    "square" -> GlyphFamily.COLORED_SQUARE
     "dot" -> GlyphFamily.BLACK_DOT
     "stick" -> GlyphFamily.BLACK_STICK
     "outline" -> GlyphFamily.BLACK_OUTLINE
@@ -235,6 +240,7 @@ private fun familyOf(pen: String): GlyphFamily? = when (pen.substringBefore('.')
 private fun defaultOf(f: GlyphFamily) = when (f) {
     GlyphFamily.COLORED_CIRCLE -> "circle.${CIRCLE_COLOURS.first()}.m"
     GlyphFamily.COLORED_TRIANGLE -> "triangle.${TRIANGLE_COLOURS.first()}.m"
+    GlyphFamily.COLORED_SQUARE -> "square.${SQUARE_COLOURS.first()}.m"
     GlyphFamily.BLACK_DOT -> "dot.black.m"
     GlyphFamily.BLACK_STICK -> "stick.black.pose000.m.${STICK_THICKNESS[STICK_THICKNESS.size / 2]}"
     GlyphFamily.BLACK_OUTLINE -> EidoGlyphCatalogV1.family(GlyphFamily.BLACK_OUTLINE).first().glyphId
@@ -247,6 +253,7 @@ private fun swatchOf(glyphId: String): Color = runCatching {
     val idx = when (val r = g.render) {
         is org.eidolang.core.model.GlyphRenderSpec.FilledCircle -> r.paletteIndex
         is org.eidolang.core.model.GlyphRenderSpec.FilledTriangle -> r.paletteIndex
+        is org.eidolang.core.model.GlyphRenderSpec.FilledSquare -> r.paletteIndex
         is org.eidolang.core.model.GlyphRenderSpec.Capsule -> r.paletteIndex
         else -> 9
     }
@@ -272,6 +279,8 @@ private fun axis(family: GlyphFamily, part: Int): List<String> = EidoGlyphCatalo
 private val CIRCLE_SIZES = axis(GlyphFamily.COLORED_CIRCLE, 2)
 private val TRIANGLE_COLOURS = axis(GlyphFamily.COLORED_TRIANGLE, 1)
 private val TRIANGLE_SIZES = axis(GlyphFamily.COLORED_TRIANGLE, 2)
+private val SQUARE_COLOURS = axis(GlyphFamily.COLORED_SQUARE, 1)
+private val SQUARE_SIZES = axis(GlyphFamily.COLORED_SQUARE, 2)
 private val DOT_SIZES = axis(GlyphFamily.BLACK_DOT, 2)
 private val STICK_THICKNESS = axis(GlyphFamily.BLACK_STICK, 4)
 private val STICK_COLOURS = axis(GlyphFamily.BLACK_STICK, 1)

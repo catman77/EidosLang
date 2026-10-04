@@ -13,7 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import org.eidolang.core.crypto.*
 import org.eidolang.core.admission.*
-import org.eidolang.core.hardening.AndroidRepositoryTextProtector
+import org.eidolang.core.hardening.AndroidMessengerRepositoryProvider
 import org.eidolang.core.multidevice.*
 import org.eidolang.core.vault.*
 import org.eidolang.core.repository.*
@@ -41,7 +41,7 @@ fun EidoMessengerApp(
 ) {
     val context = LocalContext.current
     val repo = remember(identity.certificate.deviceId) {
-        AndroidSqliteMessengerRepository(context, AndroidRepositoryTextProtector(context))
+        AndroidMessengerRepositoryProvider.get(context)
     }
     var recoveryRevision by remember { mutableIntStateOf(0) }
     val historicalProvider = remember(identity.certificate.deviceId, recoveryRevision) {
@@ -699,4 +699,3 @@ private fun DiagnosticsScreen(
         }
     }
 }
-

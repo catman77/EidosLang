@@ -76,6 +76,51 @@ class MessengerSmokeTest {
         }
     }
 
+    @Test
+    fun anEidogramCanBeCreatedSavedAndTheEditorOpenedAgain() {
+        enterHomeShell()
+        val context = androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext
+        val store = org.eidolang.feature.home.EidogramCatalogStore(context)
+        val key = "home-compose"
+        val originalDraft = kotlinx.coroutines.runBlocking {
+            org.eidolang.feature.editor.DraftStore.loadInBackground(context, key).getOrThrow()
+        }
+        val caption = "Проверка редактора ${System.currentTimeMillis()}"
+        kotlinx.coroutines.runBlocking {
+            org.eidolang.feature.editor.DraftStore.clearInBackground(context, key).await()
+        }
+        try {
+            rule.onNodeWithText("Создать", useUnmergedTree = true).performClick()
+            rule.waitUntil(5_000) {
+                rule.onAllNodesWithTag("eidogramCanvas").fetchSemanticsNodes().isNotEmpty()
+            }
+            rule.onNodeWithText("Что это значит").performTextInput(caption)
+            rule.onNodeWithText("Круги").performClick()
+            rule.onNodeWithTag("eidogramCanvas").performTouchInput { click(center) }
+            rule.onNodeWithText("Сохранить").performClick()
+            rule.waitUntil(5_000) {
+                rule.onAllNodesWithText("Создать", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty()
+            }
+            val saved = store.list().single { it.caption == caption }
+            org.junit.Assert.assertEquals(1, org.eidolang.core.model.EidogramReplay.replay(saved.document).instances.size)
+            rule.onNodeWithText("Создать", useUnmergedTree = true).performClick()
+            rule.waitUntil(5_000) {
+                rule.onAllNodesWithTag("eidogramCanvas").fetchSemanticsNodes().isNotEmpty()
+            }
+            rule.onNodeWithText("Сохранить").assertIsNotEnabled()
+            rule.onNodeWithText("←").performClick()
+        } finally {
+            store.list().filter { it.caption == caption }.forEach { store.delete(it.id) }
+            kotlinx.coroutines.runBlocking {
+                if (originalDraft.actions.isEmpty()) {
+                    org.eidolang.feature.editor.DraftStore.clearInBackground(context, key).await()
+                } else {
+                    org.eidolang.feature.editor.DraftStore.saveInBackground(context, originalDraft, key).await().getOrThrow()
+                }
+            }
+        }
+    }
+
     /**
      * Every screen behind "Ещё" can be left again.
      *

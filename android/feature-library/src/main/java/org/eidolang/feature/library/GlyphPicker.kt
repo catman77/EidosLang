@@ -25,6 +25,7 @@ fun GlyphPicker(onGlyph:(String)->Unit, modifier:Modifier=Modifier) {
                     label={ Text(when(f){
                         GlyphFamily.COLORED_CIRCLE->"Круги"
                         GlyphFamily.COLORED_TRIANGLE->"Треуг."
+                        GlyphFamily.COLORED_SQUARE->"Квадраты"
                         GlyphFamily.BLACK_DOT->"Точки"
                         GlyphFamily.BLACK_STICK->"Палочки"
                         GlyphFamily.BLACK_OUTLINE->"Контуры"

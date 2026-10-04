@@ -112,12 +112,13 @@ private fun FirstRunOnboarding(
         val ownerRaw=ownerBundleRaw
         if(uri!=null && identity!=null && ownerRaw!=null){
             runCatching{
-                val repo=AndroidSqliteMessengerRepository(
+                AndroidSqliteMessengerRepository(
                     context,AndroidRepositoryTextProtector(context)
-                )
-                val service=LocalMessengerService(repo,identity)
-                service.importOwnDevice(ownerRaw,System.currentTimeMillis())
-                service.importDeviceRosterSnapshot(read(uri),System.currentTimeMillis())
+                ).use { repo ->
+                    val service=LocalMessengerService(repo,identity)
+                    service.importOwnDevice(ownerRaw,System.currentTimeMillis())
+                    service.importDeviceRosterSnapshot(read(uri),System.currentTimeMillis())
+                }
                 identity
             }.onSuccess{
                 status="Secondary device полностью авторизован"

@@ -45,6 +45,11 @@ fun DrawScope.drawGlyph(instance: GlyphInstance, canvasWFp:Int=1_000_000, canvas
                         drawPath(path,color(EidoGlyphCatalogV1.palette[r.paletteIndex].hexSrgb))
                         if(selected) drawRect(Color(0xFF007AFF),topLeft=Offset(-w/2-5,-h/2-5),size=Size(w+10,h+10),style=Stroke(3f))
                     }
+                    is GlyphRenderSpec.FilledSquare -> {
+                        val edge=r.edgeFp*unit
+                        drawRect(color(EidoGlyphCatalogV1.palette[r.paletteIndex].hexSrgb),topLeft=Offset(-edge/2,-edge/2),size=Size(edge,edge))
+                        if(selected) drawRect(Color(0xFF007AFF),topLeft=Offset(-edge/2-5,-edge/2-5),size=Size(edge+10,edge+10),style=Stroke(3f))
+                    }
                     is GlyphRenderSpec.Capsule -> {
                         rotate(r.baseOrientationMdeg/1000f, pivot = Offset.Zero) {
                             val w=r.lengthFp*unit; val h=r.thicknessFp*unit
