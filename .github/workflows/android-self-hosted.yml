@@ -1,0 +1,76 @@
+name: Android release on self-hosted runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing version tag to build and publish
+        required: true
+        type: string
+      runner_label:
+        description: Label of the prepared ephemeral runner
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ inputs.release_tag }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # Manual runs only: pull requests never dispatch work to a developer's machine.
+    runs-on: [self-hosted, Linux, X64, '${{ inputs.runner_label }}']
+    timeout-minutes: 30
+    env:
+      TMPDIR: ${{ runner.temp }}
+      RELEASE_TAG: ${{ inputs.release_tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_tag }}
+          persist-credentials: false
+
+      # The runner provides JDK 21, Android SDK 37 and Gradle 9.5.0.
+      - name: Unit tests and APK build
+        working-directory: android
+        run: gradle :core-model:testDebugUnitTest :core-canonical:testDebugUnitTest :app:assembleDebug --no-daemon -Djava.io.tmpdir="$TMPDIR"
+
+      - name: Publish versioned APK
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const cp = require('child_process');
+            const tag = process.env.RELEASE_TAG;
+            const metadata = JSON.parse(fs.readFileSync('android/app/build/outputs/apk/debug/output-metadata.json'));
+            const version = metadata.elements[0].versionName;
+            if (tag !== `v${version}`) throw new Error('Tag and APK version differ');
+            const sha = cp.execFileSync('git', ['rev-parse', 'HEAD'], {encoding: 'utf8'}).trim();
+            const name = `eidolang-${version}-${sha.slice(0, 7)}.apk`;
+            const data = fs.readFileSync('android/app/build/outputs/apk/debug/app-debug.apk');
+            const {owner, repo} = context.repo;
+            const generated = (await github.rest.repos.generateReleaseNotes({owner, repo, tag_name: tag})).data;
+            const body = `${generated.body}\n\n` +
+              `Собрано из ${sha} через GitHub Actions на собственном runner. JVM-тесты прошли.\n\n` +
+              'APK имеет отладочную подпись. Нужен Android 8.0 или новее.';
+            let release;
+            try {
+              release = (await github.rest.repos.getReleaseByTag({owner, repo, tag})).data;
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              release = (await github.rest.repos.createRelease({
+                owner, repo, tag_name: tag, name: `EidoLang ${version}`, body,
+                draft: false, prerelease: false
+              })).data;
+            }
+            const existing = release.assets.find(asset => asset.name === name);
+            if (existing) await github.rest.repos.deleteReleaseAsset({owner, repo, asset_id: existing.id});
+            await github.rest.repos.uploadReleaseAsset({
+              owner, repo, release_id: release.id, name, data,
+              headers: {'content-type': 'application/vnd.android.package-archive', 'content-length': data.length}
+            });
+            await github.rest.repos.updateRelease({owner, repo, release_id: release.id, body});
+            core.notice(`Published ${release.html_url}`);
