@@ -30,7 +30,7 @@ import org.junit.Rule
 import org.junit.Test
 import java.io.File
 
-/** Host-driven test on a fresh isolated emulator, with the first-publication app next to this one. */
+/** Host-driven test with a rebuilt legacy fixture and disposable signer, not the public R22.1 APK. */
 @TwoDeviceOnly
 class SignatureMigrationTest {
     @get:Rule val compose = createEmptyComposeRule()

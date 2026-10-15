@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Exercise an old signed app and the migration app on one fresh rooted emulator.
 
-The legacy APK is built from 2efeb51 with LegacyMigrationFixtureTest added to its
+The legacy APK is rebuilt from 2efeb51 with LegacyMigrationFixtureTest added to its
 test sources, then both legacy APKs are signed with a separate disposable key.
+This fixture is not the published R22.1 APK and cannot establish its update compatibility.
 This driver refuses real phones and existing installations. It never uninstalls.
 """
 import argparse
@@ -121,7 +122,7 @@ def main():
             adb("forward", "--remove", f"tcp:{forwarded}")
     assert uid(OLD) == old_uid
     receipt = {
-        "fixture_source": "2efeb51 (first public source, separate disposable signing key)",
+        "fixture_source": "2efeb51 (reconstructed source, disposable signing key; not public R22.1)",
         "old_package": OLD,
         "new_package": NEW,
         "legacy_uid_preserved": True,

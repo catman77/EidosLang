@@ -21,7 +21,7 @@ import org.junit.Assert.*
 import org.junit.Test
 import java.io.File
 
-/** Copied only into the first-publication source fixture. No product code is changed there. */
+/** Copied into a reconstructed legacy source fixture, not the actual published R22.1 APK. */
 @TwoDeviceOnly
 class LegacyMigrationFixtureTest {
     private val context get() = InstrumentationRegistry.getInstrumentation().targetContext
