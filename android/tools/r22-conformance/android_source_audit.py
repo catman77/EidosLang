@@ -14,6 +14,7 @@ def ok(name, condition):
 
 main=text("app/src/main/java/org/eidolang/app/MainActivity.kt")
 onboard=text("feature-onboarding/src/main/java/org/eidolang/feature/onboarding/EidoOnboarding.kt")
+enrollment=text("feature-onboarding/src/main/java/org/eidolang/feature/onboarding/SecondaryEnrollment.kt")
 messenger=text("feature-messenger/src/main/java/org/eidolang/feature/messenger/EidoMessengerApp.kt")
 archive=text("feature-archive/src/main/java/org/eidolang/feature/archive/ArchiveScreen.kt")
 identity=text("core-crypto/src/main/java/org/eidolang/core/crypto/AndroidKeystoreIdentityStore.kt")
@@ -28,7 +29,8 @@ ok("MainActivity routes through explicit first-run EidoRootApp", "EidoRootApp" i
 ok("first-run source contains separate primary and secondary roles",
    "Создать основной профиль" in onboard and "Подключить как дополнительное устройство" in onboard)
 ok("secondary onboarding requires enrollment request, authorized bundle and root-signed roster",
-   all(x in onboard for x in ["createEnrollmentRequest","installAuthorizedBundle","importDeviceRosterSnapshot"]))
+   all(x in onboard for x in ["createEnrollmentRequest", "installAuthorizedBundle", "SecondaryEnrollment.complete"])
+   and all(x in enrollment for x in ["DeviceRosterCanonical.parseCanonical", "activeDeviceIds", "importDeviceRosterSnapshot"]))
 ok("Android primary identity store has non-creating loadIfPresent boundary and no duplicate rootPublic declaration",
    "fun loadIfPresent()" in identity and identity.count("val rootPublic = ks.getCertificate(ROOT_ALIAS).publicKey")==1)
 ok("device management source includes root authorization, roster export and revocation",
@@ -54,6 +56,6 @@ ok("Android platform backup is disabled and cleartext traffic is forbidden",
    'android:allowBackup="false"' in manifest and 'android:usesCleartextTraffic="false"' in manifest)
 ok("R22 modules/version are wired without making networking an admission dependency",
    all(x in settings for x in ['":core-admission"', '":feature-onboarding"'])
-   and 'versionName = "0.1-R22"' in appbuild)
+   and re.search(r'versionName\s*=\s*"0\.1-R22(?:\.[0-9]+)?"', appbuild) is not None)
 
 print("ALL R22 ANDROID SOURCE-AUDIT CHECKS PASS")
