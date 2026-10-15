@@ -41,4 +41,5 @@ include(
     ":feature-messenger",
     ":feature-archive",
     ":feature-onboarding",
+    ":feature-recovery",
 )

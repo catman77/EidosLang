@@ -1,22 +1,17 @@
 package org.eidolang.core.crypto
 
 import android.content.Context
-import android.os.Build
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
-import java.security.KeyPairGenerator
 import java.security.KeyStore
 import java.security.PrivateKey
-import java.security.SecureRandom
 import java.security.Signature
-import java.security.spec.ECGenParameterSpec
 import javax.crypto.Cipher
 
 /**
  * Production Android private-key holder.
  *
- * Private key material remains non-exportable in AndroidKeyStore. Public identity
- * objects are reproducible from the stable aliases on every process start.
+ * Runtime handles are non-exportable AndroidKeyStore keys. New profiles also retain sealed
+ * recovery material, so an independently encrypted account backup can recreate the same keys.
+ * Existing hardware-only identities keep their keys and user id unchanged.
  */
 class AndroidKeystoreIdentityStore(
     private val context: Context,
@@ -28,13 +23,20 @@ class AndroidKeystoreIdentityStore(
             ks.containsAlias(DEVICE_SIGN_ALIAS) &&
             ks.containsAlias(DEVICE_ENC_ALIAS)
 
-    fun loadIfPresent(): AndroidPrivateIdentity? =
-        if (exists()) ensure() else null
+    fun loadIfPresent(): AndroidPrivateIdentity? {
+        repairSavedKeys()
+        requireCompleteKeySet()
+        return if (exists()) ensure() else null
+    }
 
     fun ensure(): AndroidPrivateIdentity {
-        ensureEcSigning(ROOT_ALIAS)
-        ensureEcSigning(DEVICE_SIGN_ALIAS)
-        ensureRsaDecrypt(DEVICE_ENC_ALIAS)
+        repairSavedKeys()
+        requireCompleteKeySet()
+        check(exists() || !hasSavedProfile()) {
+            "Сохранённые данные профиля найдены, но его ключи отсутствуют. " +
+                "Новый профиль поверх них не создаётся. Нужна копия для восстановления."
+        }
+        if (!exists()) AndroidRecoverableKeyStore(context).createPrimary()
 
         val rootPublic = ks.getCertificate(ROOT_ALIAS).publicKey
         val deviceSignPublic = ks.getCertificate(DEVICE_SIGN_ALIAS).publicKey
@@ -70,36 +72,31 @@ class AndroidKeystoreIdentityStore(
         return AndroidPrivateIdentity(ks, user, cert)
     }
 
-    private fun ensureEcSigning(alias: String) {
-        if (ks.containsAlias(alias)) return
-        KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore").apply {
-            initialize(
-                KeyGenParameterSpec.Builder(alias, KeyProperties.PURPOSE_SIGN)
-                    .setAlgorithmParameterSpec(ECGenParameterSpec("secp256r1"))
-                    .setDigests(KeyProperties.DIGEST_SHA256)
-                    .build()
-            )
-            generateKeyPair()
+    private fun requireCompleteKeySet() {
+        val present = listOf(ROOT_ALIAS, DEVICE_SIGN_ALIAS, DEVICE_ENC_ALIAS).count(ks::containsAlias)
+        check(present == 0 || present == 3) {
+            "Не все ключи прежнего профиля доступны. Автоматическая замена ключей запрещена: " +
+                "она изменила бы профиль или сделала переписку недоступной."
         }
     }
 
-    private fun ensureRsaDecrypt(alias: String) {
-        if (ks.containsAlias(alias)) return
-        KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, "AndroidKeyStore").apply {
-            initialize(
-                KeyGenParameterSpec.Builder(alias, KeyProperties.PURPOSE_DECRYPT)
-                    .setKeySize(2048)
-                    .setDigests(KeyProperties.DIGEST_SHA256)
-                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_OAEP)
-                    .also { builder ->
-                        if (Build.VERSION.SDK_INT >= 35) {
-                            builder.setMgf1Digests(KeyProperties.DIGEST_SHA1)
-                        }
-                    }
-                    .build()
-            )
-            generateKeyPair()
-        }
+    private fun repairSavedKeys() {
+        if (!exists()) AndroidRecoverableKeyStore(context).repairIfSaved(AndroidRecoverableKeyStore.primaryAliases())
+    }
+
+    fun hasSavedProfile(): Boolean {
+        if (context.filesDir.resolve("eidolang-profile-v1.bin").exists() ||
+            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).contains(PREF_BODY_HASH)) return true
+        val file = context.getDatabasePath("eidolang-messenger-r18.db")
+        if (!file.exists()) return false
+        return runCatching {
+            android.database.sqlite.SQLiteDatabase.openDatabase(file.path, null,
+                android.database.sqlite.SQLiteDatabase.OPEN_READONLY).use { db ->
+                listOf("contacts", "conversations", "messages", "own_devices").any { table ->
+                    db.rawQuery("SELECT 1 FROM $table LIMIT 1", null).use { it.moveToFirst() }
+                }
+            }
+        }.getOrDefault(true)
     }
 
     companion object {

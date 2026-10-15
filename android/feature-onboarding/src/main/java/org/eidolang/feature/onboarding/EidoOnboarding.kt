@@ -12,6 +12,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import org.eidolang.core.crypto.*
 import org.eidolang.core.multidevice.AndroidSecondaryDeviceIdentityStore
+import org.eidolang.core.hardening.AndroidAccountRecovery
+import org.eidolang.feature.recovery.AccountRestoreScreen
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun EidoRootApp(
@@ -22,12 +26,36 @@ fun EidoRootApp(
     val context=LocalContext.current
     val primaryStore=remember{AndroidKeystoreIdentityStore(context)}
     val secondaryStore=remember{AndroidSecondaryDeviceIdentityStore(context)}
-    var identity by remember {
-        mutableStateOf<DevicePrivateCrypto?>(
-            primaryStore.loadIfPresent() ?: SecondaryEnrollment.readyIdentity(context)
-        )
+    val startup by produceState<Result<DevicePrivateCrypto?>?>(null) {
+        value = withContext(Dispatchers.IO) {
+            runCatching {
+                AndroidAccountRecovery.resumePending(context)
+                primaryStore.loadIfPresent() ?: SecondaryEnrollment.readyIdentity(context)
+            }
+        }
     }
-
+    if (startup == null) {
+        Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.Center) {
+            CircularProgressIndicator()
+            Text("Открываю сохранённый профиль…")
+        }
+        return
+    }
+    val savedIdentity = startup!!
+    var identity by remember {
+        mutableStateOf<DevicePrivateCrypto?>(savedIdentity.getOrNull())
+    }
+    if (savedIdentity.isFailure || (identity == null && primaryStore.hasSavedProfile())) {
+        Surface(Modifier.fillMaxSize()) {
+            Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text("Прежний профиль недоступен", style = MaterialTheme.typography.headlineSmall)
+                Text("Сохранённые данные обнаружены, но ключи профиля недоступны. " +
+                    "Новый профиль поверх них не создаётся; контакты и переписка не очищены.")
+                savedIdentity.exceptionOrNull()?.message?.let { Text(it) }
+            }
+        }
+        return
+    }
     val primaryExists=remember{primaryStore.exists()}
     val secondaryExists=remember{secondaryStore.load()!=null}
     if(primaryExists && secondaryExists){
@@ -73,6 +101,11 @@ private fun FirstRunOnboarding(
     var requestRaw by remember{mutableStateOf(ownerBundleRaw?.let(secondaryStore::createEnrollmentRequest))}
     var installedSecondary by remember{mutableStateOf(secondaryStore.load())}
     var status by remember{mutableStateOf<String?>(null)}
+    var restoring by remember { mutableStateOf(false) }
+    if (restoring) {
+        AccountRestoreScreen(onRestored = onReady, onBack = { restoring = false })
+        return
+    }
 
     fun read(uri:android.net.Uri):String =
         context.contentResolver.openInputStream(uri)!!
@@ -149,6 +182,7 @@ private fun FirstRunOnboarding(
                 )
             }
             status?.let{Text(it,color=MaterialTheme.colorScheme.onSurfaceVariant)}
+            OutlinedButton(onClick = { restoring = true }) { Text("Восстановить профиль из копии") }
 
             if(!secondaryMode){
                 Button(onClick={

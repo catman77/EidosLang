@@ -11,6 +11,7 @@ android {
     }
 }
 dependencies {
+    implementation(libs.androidx.work.runtime)
     implementation(project(":core-model"))
     implementation(project(":core-canonical"))
     implementation(project(":core-crypto"))

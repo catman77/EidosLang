@@ -50,6 +50,9 @@ class OnionKeyDerivationTest {
     @Test
     fun addressSurvivesLosingEverythingStoredOnTheDevice() {
         val ctx = InstrumentationRegistry.getInstrumentation().targetContext
+        check(ctx.packageName == "org.eidolang.app.recoverycheck") {
+            "A key-loss experiment must never change the owner's installed onion identity"
+        }
         val derived = OnionServiceKey.fromRecoverySecret(secret)
 
         val tor = EidoTor.of(ctx)

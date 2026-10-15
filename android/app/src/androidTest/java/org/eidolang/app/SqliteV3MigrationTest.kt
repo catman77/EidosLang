@@ -31,8 +31,8 @@ class SqliteV3MigrationTest {
 
     private lateinit var context: Context
 
-    /** Must match `AndroidSqliteMessengerRepository.DB_NAME`, which is private. */
-    private val dbName = "eidolang-messenger-r18.db"
+    /** A fixture database must never occupy the owner's database path. */
+    private val dbName = "eidolang-v3-migration-fixture.db"
 
     private val aliceAlias = "Алиса — основной телефон"
     private val bobAlias = "Bob's tablet"
@@ -46,41 +46,16 @@ class SqliteV3MigrationTest {
 
     private fun protector() = AndroidRepositoryTextProtector(context)
 
-    private fun openRepository() = AndroidSqliteMessengerRepository(context, protector())
+    private fun openRepository() = AndroidSqliteMessengerRepository(context, protector(), dbName)
 
-    /** Where the device's own database is parked while this test owns the real path. */
-    private val backup get() = java.io.File(context.cacheDir, "$dbName.preserved")
-
-    /**
-     * Take the hand-built database away again.
-     *
-     * It deletes in `@Before` only, which left the synthetic legacy rows in place for whatever ran
-     * next — and one of them is `descriptor_json = {"conversation_id": ...}`, a stub that
-     * `ConversationParser` rightly refuses. Any later screen calling `conversationSummaries()` then
-     * died with `Object schema mismatch`. `connectedDebugAndroidTest` happened to hide it by running
-     * `MessengerSmokeTest` first; running the classes in any other order surfaced it immediately.
-     * A test may build whatever wreckage it needs, but it does not get to leave it behind.
-     */
     @After
     fun tearDown() {
-        context.deleteDatabase(dbName)
-        // Give the device back the database this test displaced. Without this the suite is
-        // destructive on any real installation: it builds its legacy database *at the production
-        // path*, so `deleteDatabase` here and in `setUp` takes the owner's contacts, conversations
-        // and messages with it. That is not hypothetical — it wiped a tablet mid-session, and the
-        // resulting "the sender publishes but nothing is received" looked like a delivery bug for
-        // an hour. A test may own the path; it may not keep what it found there.
-        if (backup.exists()) {
-            backup.copyTo(context.getDatabasePath(dbName), overwrite = true)
-            backup.delete()
-        }
+        if (::context.isInitialized) context.deleteDatabase(dbName)
     }
 
     @Before
     fun setUp() {
         context = InstrumentationRegistry.getInstrumentation().targetContext
-        val live = context.getDatabasePath(dbName)
-        if (live.exists()) live.copyTo(backup, overwrite = true)
         context.deleteDatabase(dbName)
 
         val random = SecureRandom()

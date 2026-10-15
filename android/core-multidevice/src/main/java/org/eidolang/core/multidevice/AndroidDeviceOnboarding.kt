@@ -1,15 +1,10 @@
 package org.eidolang.core.multidevice
 
 import android.content.Context
-import android.os.Build
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
 import org.eidolang.core.crypto.*
-import java.security.KeyPairGenerator
 import java.security.KeyStore
 import java.security.PrivateKey
 import java.security.Signature
-import java.security.spec.ECGenParameterSpec
 import javax.crypto.Cipher
 
 /**
@@ -96,39 +91,26 @@ class AndroidSecondaryDeviceIdentityStore(private val context: Context) {
     fun load(): DevicePrivateCrypto? {
         if (!bundleFile.exists()) return null
         val bundle = IdentityParser.parsePublicBundleCanonical(bundleFile.readText(Charsets.UTF_8))
-        ensureDeviceKeys()
+        if (!ks.containsAlias(SIGN_ALIAS) || !ks.containsAlias(ENC_ALIAS))
+            AndroidRecoverableKeyStore(context).repairIfSaved(listOf(SIGN_ALIAS, ENC_ALIAS))
+        check(ks.containsAlias(SIGN_ALIAS) && ks.containsAlias(ENC_ALIAS)) {
+            "Ключи дополнительного устройства отсутствуют. Сохранённый профиль не заменён."
+        }
+        check(PublicKeyCodec.encode(ks.getCertificate(SIGN_ALIAS).publicKey) == bundle.device.body.signingPublicKeyB64 &&
+            PublicKeyCodec.encode(ks.getCertificate(ENC_ALIAS).publicKey) == bundle.device.body.encryptionPublicKeyB64) {
+            "Сохранённый профиль не соответствует ключам устройства."
+        }
         return AndroidSecondaryPrivateIdentity(ks, bundle.user, bundle.device)
     }
 
     private fun ensureDeviceKeys() {
-        if (!ks.containsAlias(SIGN_ALIAS)) {
-            KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore").apply {
-                initialize(
-                    KeyGenParameterSpec.Builder(SIGN_ALIAS, KeyProperties.PURPOSE_SIGN)
-                        .setAlgorithmParameterSpec(ECGenParameterSpec("secp256r1"))
-                        .setDigests(KeyProperties.DIGEST_SHA256)
-                        .build()
-                )
-                generateKeyPair()
-            }
+        if (ks.containsAlias(SIGN_ALIAS) && ks.containsAlias(ENC_ALIAS)) return
+        val recoverable = AndroidRecoverableKeyStore(context)
+        if (recoverable.repairIfSaved(listOf(SIGN_ALIAS, ENC_ALIAS))) return
+        check(!ks.containsAlias(SIGN_ALIAS) && !ks.containsAlias(ENC_ALIAS)) {
+            "Нельзя заменить неполный набор ключей дополнительного устройства"
         }
-        if (!ks.containsAlias(ENC_ALIAS)) {
-            KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, "AndroidKeyStore").apply {
-                initialize(
-                    KeyGenParameterSpec.Builder(ENC_ALIAS, KeyProperties.PURPOSE_DECRYPT)
-                        .setKeySize(2048)
-                        .setDigests(KeyProperties.DIGEST_SHA256)
-                        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_OAEP)
-                        .also { builder ->
-                            if (Build.VERSION.SDK_INT >= 35) {
-                                builder.setMgf1Digests(KeyProperties.DIGEST_SHA1)
-                            }
-                        }
-                        .build()
-                )
-                generateKeyPair()
-            }
-        }
+        recoverable.createDevice(SIGN_ALIAS, ENC_ALIAS)
     }
 
     private fun atomicWrite(file: java.io.File, text: String) {

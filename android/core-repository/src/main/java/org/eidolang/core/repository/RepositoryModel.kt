@@ -9,12 +9,15 @@ interface RepositoryTextProtector {
     fun isProtected(stored: String): Boolean
 }
 
-interface HistoricalDocumentProvider {
+interface HistoricalDocumentProvider : AutoCloseable {
+    override fun close() {}
     /**
      * Returns an authenticated recovered document for the exact immutable message id,
      * or null when this provider has no recovery record for that message.
      */
     fun documentFor(messageId: String): EidogramDocumentV1?
+    fun payloadFor(messageId: String): org.eidolang.core.canonical.EidoMessagePayloadV1? =
+        documentFor(messageId)?.let { org.eidolang.core.canonical.EidoMessagePayloadV1(it, "") }
 }
 
 data class ContactDeviceRecord(

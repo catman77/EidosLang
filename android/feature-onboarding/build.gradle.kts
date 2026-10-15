@@ -13,6 +13,7 @@ android {
     }
 }
 dependencies {
+    implementation(project(":feature-recovery"))
     implementation(project(":core-crypto"))
     implementation(project(":core-multidevice"))
     implementation(project(":core-repository"))

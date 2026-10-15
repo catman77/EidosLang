@@ -43,13 +43,14 @@ retry() {                               # retry <attempts> <cmd...>
 }
 
 fresh_install() {
-  local d=$1
+  local d=$1 installed
   banner "installing on $d"
   wait_device "$d"
-  # Uninstall first: a secondary install must not inherit AndroidKeyStore aliases or files.
-  adb -s "$d" uninstall "$PKG" >/dev/null 2>&1 || true
-  adb -s "$d" uninstall "$PKG.test" >/dev/null 2>&1 || true
-  # Streamed install occasionally fails on a USB blip right after uninstall; retry rather than abort.
+  installed="$(adb -s "$d" shell pm list packages -u "$PKG")" || exit 2
+  if printf '%s\n' "$installed" | tr -d '\r' | grep -Fxq "package:$PKG"; then
+    echo "Refusing to replace an existing or retained profile on $d. Use a fresh test device." >&2
+    exit 2
+  fi
   retry 3 adb -s "$d" install -r -t "$APK" >/dev/null
   retry 3 adb -s "$d" install -r -t "$TAPK" >/dev/null
 }

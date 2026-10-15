@@ -48,11 +48,14 @@ wait_device() { timeout 120 adb -s "$1" wait-for-device || { echo "device $1 did
 retry() { local n=$1; shift; local i; for ((i=1;i<=n;i++)); do "$@" && return 0; sleep 3; done; return 1; }
 
 fresh_install() {
-  local d=$1
+  local d=$1 installed
   banner "installing on $d"
   wait_device "$d"
-  adb -s "$d" uninstall "$PKG" >/dev/null 2>&1 || true
-  adb -s "$d" uninstall "$PKG.test" >/dev/null 2>&1 || true
+  installed="$(adb -s "$d" shell pm list packages -u "$PKG")" || exit 2
+  if printf '%s\n' "$installed" | tr -d '\r' | grep -Fxq "package:$PKG"; then
+    echo "Refusing to replace an existing or retained profile on $d. Use a fresh test device." >&2
+    exit 2
+  fi
   retry 3 adb -s "$d" install -r -t "$APK" >/dev/null
   retry 3 adb -s "$d" install -r -t "$TAPK" >/dev/null
 }

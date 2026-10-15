@@ -93,6 +93,8 @@ object ContactCard {
         nickname: String = "",
         avatarPng: ByteArray? = null,
         onion: String = "",
+        context: Context? = null,
+        deviceState: ContactDeviceState? = context?.let { ContactDeviceState.capture(it, identity) },
     ): String =
         CanonicalJson.obj(
             mapOf(
@@ -116,7 +118,7 @@ object ContactCard {
                 "transport" to CanonicalJson.obj(
                     mapOf("onion" to CanonicalJson.string(onion))
                 ),
-            )
+            ) + (deviceState?.let { mapOf("device_state" to it.json()) } ?: emptyMap())
         )
 
     data class Parsed(
@@ -125,6 +127,7 @@ object ContactCard {
         val nickname: String = "",
         val avatarPng: ByteArray? = null,
         val onion: String = "",
+        val deviceState: ContactDeviceState? = null,
     )
 
     /** Accepts a card or a bare R22 identity bundle, so older exports still import. */
@@ -141,6 +144,10 @@ object ContactCard {
         val publisher = root.fields["publisher"]?.let {
             ArchivePublisherParser.parseCanonical(org.eidolang.core.canonical.CanonicalReserialize.of(it))
         }
+        publisher?.let {
+            require(org.eidolang.core.archive.ArchivePublisherVerifier.verify(it,
+                IdentityParser.parsePublicBundleCanonical(identity))) { "Publisher identity mismatch" }
+        }
         // Optional: cards written before this field exist in the wild, and a card is a file people
         // have already exchanged.
         val profile = root.fields["profile"] as? JValue.Obj
@@ -155,7 +162,10 @@ object ContactCard {
             ?.value.orEmpty()
             .takeIf { it.matches(Regex("[a-z2-7]{56}\\.onion")) }
             .orEmpty()
-        return Parsed(identity, publisher, nickname, avatar, onion)
+        val state = root.fields["device_state"]?.let {
+            ContactDeviceState.parse(it, IdentityParser.parsePublicBundleCanonical(identity))
+        }
+        return Parsed(identity, publisher, nickname, avatar, onion, state)
     }
 }
 
@@ -575,20 +585,11 @@ fun publishConversation(
     contactBundleCanonical: String,
 ): String {
     EidoRelaySettings.apply(context)
-    val repository = AndroidSqliteMessengerRepository(context, AndroidRepositoryTextProtector(context))
-    val envelopes = repository.use { it.messages(conversationId).map { m -> m.envelopeCanonicalJson } }
-    require(envelopes.isNotEmpty()) { "нечего отправлять" }
-
     val conversation = service.conversationDescriptor(conversationId)
     val contact = IdentityParser.parsePublicBundleCanonical(contactBundleCanonical)
-    val segment = ConversationSegmentBuilder.build(
-        conversation = conversation,
-        identityBundles = listOf(
-            PublicIdentityBundleV1(identity.user, identity.certificate),
-            PublicIdentityBundleV1(contact.user, contact.device),
-        ),
-        messageCanonicalJson = envelopes,
-    )
+    val segment = AndroidSqliteMessengerRepository(context, AndroidRepositoryTextProtector(context)).use {
+        buildConversationPublication(it, identity, conversationId)
+    }
     // Seeding to the swarm is likewise nobody's critical path — the recipient reaches the bytes
     // through the locker or the onion — so it no longer holds up the send either.
     Thread { runCatching { eido.transport.seed(TransportObjects.fromArtifact(segment)) } }
@@ -724,7 +725,7 @@ fun receiveFrom(
     contactUserId: String,
     contactBundleCanonical: String,
 ): ReceiveResult {
-    val publisherCert = ContactPublisherStore(context).get(contactUserId)
+    var publisherCert = ContactPublisherStore(context).get(contactUserId)
         ?: return ReceiveResult(0, "нет ключа публикации — добавьте контакт заново по коду или ссылке")
     val conversation = ConversationConvention.oneToOne(identity.user.userId, contactUserId)
 
@@ -787,6 +788,30 @@ fun receiveFrom(
         }
     val head = ConversationHeadCodec.parseMutablePutFields(headRecord.fieldsBencoded)
     val value = ConversationHeadCodec.decodeValue(head.value)
+    var publisherIdentity = org.eidolang.core.hardening.AndroidMessengerRepositoryProvider.get(context)
+        .contactDevices().firstOrNull { it.userId == contactUserId && it.deviceId == publisherCert.deviceId }
+        ?.bundleCanonicalJson ?: contactBundleCanonical
+    if (value.publisherDeviceId != publisherCert.deviceId) {
+        val alias = service.contactSummaries().first { it.userId == contactUserId }.alias
+        val pinnedPublisher = publisherCert
+        fun verifiedReplacement(raw: String): ContactCard.Parsed? = runCatching {
+            val card = ContactCard.read(raw)
+            require(card.publisher?.deviceId == value.publisherDeviceId)
+            require(ConversationHeadCodec.verify(head, card.publisher!!,
+                IdentityParser.parsePublicBundleCanonical(card.identityCanonical)))
+            val repository = org.eidolang.core.hardening.AndroidMessengerRepositoryProvider.get(context)
+            adoptRecoveredContact(service, repository, contactUserId, pinnedPublisher, card)
+            card
+        }.getOrNull()
+        val direct = senderOnion?.let { onion -> EidoOnionClient.get(onion, "/profile", maxBytes = EidoInvite.MAX_CARD_BYTES)
+            ?.toString(Charsets.UTF_8)?.let(::verifiedReplacement) }
+        val updated = direct ?: Relay.searchDirectory(EidoHandle.nicknameOf(alias))
+            ?.filter { it.userId == contactUserId }?.firstNotNullOfOrNull { verifiedReplacement(it.cardJson) }
+            ?: return ReceiveResult(0, "Собеседник восстановил профиль. Не удалось проверить его актуальную визитку; повторите позже.")
+        publisherCert = updated.publisher!!
+        publisherIdentity = updated.identityCanonical
+        ContactPublisherStore(context).put(contactUserId, publisherCert)
+    }
     // Same order for the payload. The torrent name is recomputed from the head we just verified the
     // signature of, never taken from whoever answered.
     val name = OnionDelivery.torrentName(value.conversationId, value.segmentId)
@@ -807,7 +832,7 @@ fun receiveFrom(
     val accepted = NetworkAdmissionGate.admit(
         fetched, headRecord,
         ArchivePublisherCanonical.certificateJson(publisherCert),
-        contactBundleCanonical,
+        publisherIdentity,
     )
     val manifest = SegmentParser.parseCanonical(
         fetched.swarm.files.single { it.path == "segment-manifest.json" }.bytes.toString(Charsets.UTF_8)
@@ -829,6 +854,13 @@ fun receiveFrom(
     }.getOrDefault(emptySet())
 
     val before = storedIds()
+    accepted.artifact.manifest.identityEntries.forEach { entry ->
+        val raw = fetched.swarm.files.single { it.path == entry.path }.bytes.toString(Charsets.UTF_8)
+        val bundle = IdentityParser.parsePublicBundleCanonical(raw)
+        if (bundle.user.userId == identity.user.userId) service.importOwnDevice(raw, System.currentTimeMillis())
+        else if (bundle.user.userId == contactUserId) service.importContact(raw,
+            service.contactSummaries().first { it.userId == contactUserId }.alias, System.currentTimeMillis())
+    }
     // Only what is not already here.
     //
     // A segment carries the whole conversation, so every poll used to re-admit every message ever

@@ -24,12 +24,14 @@ class HistoryVaultDocumentProvider(
         .map(HistoryVaultEntryCodec::parseCanonical)
         .associateBy{it.body.messageId}
 
-    override fun documentFor(messageId:String):EidogramDocumentV1?{
+    override fun documentFor(messageId:String):EidogramDocumentV1? = payloadFor(messageId)?.document
+
+    override fun payloadFor(messageId:String):org.eidolang.core.canonical.EidoMessagePayloadV1?{
         val e=entries[messageId]?:return null
         val key=epochKeys[e.body.epochId]?:error("Vault epoch key missing")
         val payload=HistoryVaultCrypto.openEntry(descriptor,key,e)
         // R22.2 plaintext is a payload wrapper; pre-R22.2 archives hold a bare document.
-        return EidoMessagePayloadCanonical.parseCanonical(payload.documentCanonicalJson).document
+        return EidoMessagePayloadCanonical.parseCanonical(payload.documentCanonicalJson)
     }
 
     fun messageEnvelopeFor(messageId:String):String?{
@@ -38,7 +40,7 @@ class HistoryVaultDocumentProvider(
         return HistoryVaultCrypto.openEntry(descriptor,key,e).messageEnvelopeCanonicalJson
     }
 
-    fun close(){
+    override fun close(){
         epochKeys.values.forEach{it.fill(0)}
     }
 }

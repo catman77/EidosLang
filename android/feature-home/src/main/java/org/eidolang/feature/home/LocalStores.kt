@@ -35,7 +35,7 @@ class EidoProfileStore(private val context: Context) {
 
     fun load(): Profile? {
         if (!file.exists()) return null
-        return runCatching {
+        return run {
             val raw = box.open(NS, ID, file.readText(Charsets.UTF_8)).toString(Charsets.UTF_8)
             val o = StrictJsonParser(raw).parse() as JValue.Obj
             val nick = (o.fields["nickname"] as JValue.Str).value
@@ -43,7 +43,7 @@ class EidoProfileStore(private val context: Context) {
                 ?.takeIf { it.isNotEmpty() }
                 ?.let { android.util.Base64.decode(it, android.util.Base64.NO_WRAP) }
             Profile(nick, avatar)
-        }.getOrNull()
+        }
     }
 
     fun save(profile: Profile) {

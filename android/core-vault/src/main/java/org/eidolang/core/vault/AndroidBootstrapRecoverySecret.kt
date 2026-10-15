@@ -31,7 +31,7 @@ object AndroidBootstrapRecoverySecret {
     /** The device's recovery secret, generating and sealing it on first call. */
     fun ensure(context: Context): HistoryVaultRecoverySecret {
         val store = AndroidHistoryVaultSecretStore(context)
-        runCatching { store.load(SLOT) }.getOrNull()?.let { return it }
+        store.load(SLOT)?.let { return it }
         val fresh = HistoryVaultRecoverySecret.generate()
         store.save(SLOT, fresh)
         return fresh
@@ -59,7 +59,8 @@ object AndroidBootstrapRecoverySecret {
      */
     fun forOnion(context: Context): HistoryVaultRecoverySecret {
         AndroidHistoryVaultPackageStore(context).activeVaultId()?.let { id ->
-            runCatching { AndroidHistoryVaultSecretStore(context).load(id) }.getOrNull()?.let { return it }
+            return AndroidHistoryVaultSecretStore(context).load(id)
+                ?: error("Секрет активного архива отсутствует. Адрес профиля не заменён новым.")
         }
         return ensure(context)
     }

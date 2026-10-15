@@ -37,8 +37,10 @@ class AndroidHistoryVaultSecretStore(private val context:Context){
         val parts=f.readText(Charsets.US_ASCII).split(".")
         require(parts.size==2)
         val cipher=Cipher.getInstance(CryptoSuiteV1.AES_JCA)
+        val existingKey=ks.getKey(ALIAS,null) as? SecretKey
+            ?: error("Ключ локальной копии архива отсутствует. Используйте сохранённую копию и код восстановления.")
         cipher.init(
-            Cipher.DECRYPT_MODE,key(),
+            Cipher.DECRYPT_MODE,existingKey,
             GCMParameterSpec(CryptoSuiteV1.GCM_TAG_BITS,B64Url.decode(parts[0]))
         )
         cipher.updateAAD(vaultId.toByteArray(Charsets.UTF_8))

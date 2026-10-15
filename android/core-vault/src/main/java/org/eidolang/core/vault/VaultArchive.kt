@@ -239,7 +239,8 @@ class HistoryVaultController private constructor(
                 if(row.messageId !in entries){
                     val timeline=docs[row.messageId]?:error("Verified timeline document missing")
                     val entry=HistoryVaultCrypto.sealEntry(
-                        descriptor,epochs.last(),row.envelopeCanonicalJson,timeline.document,random
+                        descriptor,epochs.last(),row.envelopeCanonicalJson,timeline.document,random,
+                        caption=timeline.caption
                     )
                     entries[row.messageId]=entry
                     added++

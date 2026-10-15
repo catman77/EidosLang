@@ -21,10 +21,14 @@ import javax.crypto.KeyGenerator
  * Run on a disposable emulator only. On a real device an uninstall would take the owner's identity
  * with it.
  */
+@TwoDeviceOnly
 class KeystoreSurvivesUninstallTest {
 
     @Test
     fun probeKeystoreAliasAcrossInstalls() {
+        check(InstrumentationRegistry.getInstrumentation().targetContext.packageName == "org.eidolang.app.recoverycheck") {
+            "The uninstall probe must use the separate recovery-check installation"
+        }
         val ks = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
         val existed = ks.containsAlias(ALIAS)
         if (!existed) {

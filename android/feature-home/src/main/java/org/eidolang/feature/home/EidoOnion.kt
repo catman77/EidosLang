@@ -103,6 +103,7 @@ class EidoOnionServer(
             // PNG is the one part of a contact card that will not fit in a QR code, and it is also
             // the one part nobody needs at the moment of meeting.
             path == "/avatar" -> store.avatar()
+            path == "/profile" -> store.latestCard()
             // The owner's contact card, which is what an invite link resolves to. Public by
             // definition — it is the file people already hand each other — and bound to this
             // address: the link carries its hash, so this route cannot answer with another identity
@@ -179,6 +180,7 @@ class OnionStore(context: Context) {
     private val segments = File(context.filesDir, "onion/segment")
     private val avatarFile = File(context.filesDir, "onion/avatar.png")
     private val cards = File(context.filesDir, "onion/card")
+    private val currentCard = File(context.filesDir, "onion/current-card.json")
 
     fun putHead(target: String, bytes: ByteArray) = put(heads, target, 40, bytes)
 
@@ -217,6 +219,10 @@ class OnionStore(context: Context) {
         val hash = org.eidolang.core.crypto.HexSha256.of(json)
         cards.mkdirs()
         File(cards, "$hash.json").writeBytes(json)
+        val atomic = android.util.AtomicFile(currentCard)
+        val output = atomic.startWrite()
+        try { output.write(json); atomic.finishWrite(output) }
+        catch (t: Throwable) { atomic.failWrite(output); throw t }
         // A bound on the pathological case only: cards are ~2.4 KB, so keeping a long history costs
         // nothing, but a loop that rewrote the profile forever should not fill the device.
         cards.listFiles()?.sortedByDescending { it.lastModified() }?.drop(MAX_CARDS)
@@ -229,6 +235,8 @@ class OnionStore(context: Context) {
         return File(cards, "$sha256Hex.json").takeIf { it.isFile }
             ?.takeIf { it.length() <= EidoInvite.MAX_CARD_BYTES }?.readBytes()
     }
+
+    fun latestCard(): ByteArray? = currentCard.takeIf { it.isFile && it.length() <= EidoInvite.MAX_CARD_BYTES }?.readBytes()
 
     fun head(target: String): ByteArray? = get(heads, target, 40)
 
@@ -296,11 +304,9 @@ object EidoOnionNode {
     val isReachable: Boolean get() = address != null
 
     /**
-     * Whether the address was derived from the recovery secret, and therefore survives a reinstall.
-     *
-     * False means the owner has no history vault yet: the address is a local key and dies with the
-     * app. Worth surfacing, because the difference is invisible until somebody reinstalls and their
-     * contacts quietly stop reaching them.
+     * Whether the address was derived from the recovery secret. This says nothing about whether
+     * the owner has actually exported that secret. Reinstall recovery also requires retained data
+     * or a previously saved recovery pair; derivation alone is not persistence.
      */
     @Volatile
     var portable: Boolean = false
@@ -322,7 +328,7 @@ object EidoOnionNode {
                         ledger.served(infoHash, path, System.currentTimeMillis())
                     }.start()
                     val derived = derivedKey(app)
-                    portable = derived != null && app.packageName != "org.eidolang.app.migration"
+                    portable = app.packageName != "org.eidolang.app.migration"
                     val tor = EidoTor.of(app)
                     address = tor.startAndPublish(derivedKey = derived)
                     // The routes, not just the verdict. Diagnosing why an address failed to appear
@@ -341,11 +347,10 @@ object EidoOnionNode {
      * The primary's recovery-derived key, or a device-specific key from the parallel install's
      * local bootstrap secret. The latter deliberately stays independent of imported archives.
      *
-     * Never null in practice: the secret is created at first run precisely so that the address is
-     * available from the very first card. Null only if the Keystore itself refuses, in which case
-     * Tor falls back to a local key. [portable] is only true for the primary recovery-derived route.
+     * Failure to open a saved secret must stop publication, rather than replace the owner's
+     * address with an unrelated local key. [portable] describes derivation, not backup status.
      */
-    fun derivedKey(context: Context): String? = runCatching {
+    fun derivedKey(context: Context): String {
         // Keep the parallel device's local address stable across archive imports. Reusing the
         // primary's recovery-derived key would give two live Tor services the same endpoint.
         val secret = if (context.packageName == "org.eidolang.app.migration")
@@ -354,11 +359,11 @@ object EidoOnionNode {
         try {
             val deviceId = if (context.packageName == "org.eidolang.app.migration")
                 AndroidSecondaryDeviceIdentityStore(context).load()?.certificate?.deviceId else null
-            OnionServiceKey.fromRecoverySecret(raw, deviceId)
+            return OnionServiceKey.fromRecoverySecret(raw, deviceId)
         } finally {
             raw.fill(0)
         }
-    }.getOrNull()
+    }
 }
 
 /**

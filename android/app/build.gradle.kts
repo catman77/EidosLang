@@ -18,8 +18,8 @@ android {
         applicationId = "org.eidolang.app"
         minSdk = 26
         targetSdk = 37
-        versionCode = 4
-        versionName = "0.1-R22.3"
+        versionCode = 6
+        versionName = "0.1-R22.5"
         buildConfigField("boolean", "MIGRATION_INSTALL", "false")
         manifestPlaceholders["appLabel"] = "EidoLang"
         // Two-device enrollment is driven by tools/two-device-enrollment.sh, not by this suite.
@@ -47,6 +47,23 @@ android {
             buildConfigField("boolean", "MIGRATION_INSTALL", "true")
             manifestPlaceholders["appLabel"] = "EidoLang — дополнительная установка"
         }
+        // Host-driven reinstall checks have a separate UID and never touch the owner's install.
+        create("retentionCheck") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ".retentioncheck"
+            versionNameSuffix = "-retention-check"
+            matchingFallbacks += "debug"
+            signingConfig = signingConfigs.getByName("distribution")
+            manifestPlaceholders["appLabel"] = "EidoLang — проверка сохранения"
+        }
+        create("recoveryCheck") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ".recoverycheck"
+            versionNameSuffix = "-recovery-check"
+            matchingFallbacks += "debug"
+            signingConfig = signingConfigs.getByName("distribution")
+            manifestPlaceholders["appLabel"] = "EidoLang — проверка восстановления"
+        }
     }
 
     testBuildType = providers.gradleProperty("eidoTestBuildType").orElse("debug").get()
@@ -66,7 +83,8 @@ val validateReleaseSigning by tasks.registering {
     }
 }
 tasks.matching {
-    it.name in setOf("preReleaseBuild", "validateSigningRelease", "preMigrationBuild", "validateSigningMigration")
+    it.name in setOf("preReleaseBuild", "validateSigningRelease", "preMigrationBuild", "validateSigningMigration",
+        "preRetentionCheckBuild", "validateSigningRetentionCheck", "preRecoveryCheckBuild", "validateSigningRecoveryCheck")
 }
     .configureEach { dependsOn(validateReleaseSigning) }
 

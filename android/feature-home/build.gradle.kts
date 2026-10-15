@@ -13,6 +13,7 @@ android {
     }
 }
 dependencies {
+    implementation(project(":feature-recovery"))
     // Tor as Briar ships it: the same binary and the same wrapper that a shipping onion-routed
     // messenger uses, rather than a JNI build of our own.
     implementation("org.briarproject:onionwrapper-android:0.1.3")

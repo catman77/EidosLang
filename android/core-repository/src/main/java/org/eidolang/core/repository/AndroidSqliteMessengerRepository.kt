@@ -11,7 +11,8 @@ import org.eidolang.core.message.MessageParser
 class AndroidSqliteMessengerRepository(
     context: Context,
     private val textProtector: RepositoryTextProtector,
-) : SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION),
+    databaseName: String = DB_NAME,
+) : SQLiteOpenHelper(context, databaseName, null, DB_VERSION),
     MessengerRepository {
 
     override fun onCreate(db: SQLiteDatabase) {

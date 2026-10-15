@@ -34,8 +34,10 @@ class AndroidLocalSecretBox(private val context:Context){
         require(p.size==3 && p[0]=="v1"){"Unsupported local secret-box format"}
         val nonce=B64Url.decode(p[1])
         val cipher=Cipher.getInstance(CryptoSuiteV1.AES_JCA)
+        val existingKey=ks.getKey(ALIAS,null) as? SecretKey
+            ?: error("Ключ сохранённых данных отсутствует. Данные не заменены и не очищены.")
         cipher.init(
-            Cipher.DECRYPT_MODE,key(),
+            Cipher.DECRYPT_MODE,existingKey,
             GCMParameterSpec(CryptoSuiteV1.GCM_TAG_BITS,nonce)
         )
         cipher.updateAAD(aad(namespace,logicalId))

@@ -24,6 +24,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.eidolang.core.crypto.DevicePrivateCrypto
 import org.eidolang.core.hardening.AndroidMessengerRepositoryProvider
+import org.eidolang.core.hardening.AccountBackups
+import org.eidolang.feature.recovery.AccountBackupScreen
+import org.eidolang.feature.recovery.BackupStatusText
 import org.eidolang.core.repository.ContactSummary
 import org.eidolang.core.repository.LocalMessengerService
 import kotlinx.coroutines.Dispatchers
@@ -54,8 +57,22 @@ fun EidoHomeApp(
     val profileStore = remember { EidoProfileStore(context) }
     val catalog = remember { EidogramCatalogStore(context) }
 
-    var profile by remember { mutableStateOf(profileStore.load()) }
+    val savedProfile = remember { runCatching { profileStore.load() } }
+    if (savedProfile.isFailure) {
+        Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text("Не удалось открыть сохранённый профиль", style = MaterialTheme.typography.titleLarge)
+            Text("Имя, фото, контакты и переписка не заменены. Нельзя создавать новый профиль поверх этих данных.")
+            Text(savedProfile.exceptionOrNull()?.message.orEmpty())
+        }
+        return
+    }
+    var profile by remember { mutableStateOf(savedProfile.getOrNull()) }
     var editingProfile by remember { mutableStateOf(false) }
+    var backupReady by remember { mutableStateOf(AccountBackups.isConfigured(context)) }
+    var showBackup by remember { mutableStateOf(false) }
+    val canPrepareBackup = remember(identity.certificate.deviceId) {
+        runCatching { org.eidolang.core.hardening.AndroidAccountRecovery.canPrepareBackup(context, identity) }.getOrDefault(false)
+    }
     if (profile == null) {
         ProfileSetupScreen(onDone = { chosen ->
             profileStore.save(chosen)
@@ -78,6 +95,14 @@ fun EidoHomeApp(
         )
         return
     }
+    if ((!backupReady && canPrepareBackup) || showBackup) {
+        AccountBackupScreen(identity, required = !backupReady && canPrepareBackup, onDone = {
+            backupReady = AccountBackups.isConfigured(context)
+            showBackup = false
+        })
+        return
+    }
+    LaunchedEffect(Unit) { AccountBackups.start(context) }
 
     val restoredHistory = remember { runCatching { RestoredHistory.open(context) } }
     DisposableEffect(restoredHistory) {
@@ -190,6 +215,7 @@ fun EidoHomeApp(
                             nickname = me?.nickname.orEmpty(),
                             avatarPng = null,
                             onion = onion,
+                            context = context,
                         )
                         // Filed under its own hash and kept alongside earlier versions, so a
                         // renamed profile does not silently break codes already given out.
@@ -226,6 +252,7 @@ fun EidoHomeApp(
                     nickname = me?.nickname.orEmpty(),
                     avatarPng = me?.avatarPng,
                     onion = EidoOnionNode.address.orEmpty(),
+                    context = context,
                 )
                 val fingerprint = org.eidolang.core.crypto.HexSha256.ofUtf8(card)
                 when {
@@ -273,7 +300,18 @@ fun EidoHomeApp(
                                     "Не удалось забрать визитку: " +
                                         (EidoOnionClient.lastError ?: "устройство не отвечает")
                                 )
-                            importCard(context, service, ContactCard.read(json)).alias
+                            val pinned = ContactCard.read(json)
+                            val imported = importCard(context, service, pinned)
+                            if (pinned.deviceState == null && pinned.publisher != null) {
+                                runCatching {
+                                    val latest = EidoOnionClient.get(pending.onion, "/profile", maxBytes = EidoInvite.MAX_CARD_BYTES)
+                                        ?.toString(Charsets.UTF_8)?.let(ContactCard::read) ?: return@runCatching
+                                    adoptRecoveredContact(service, AndroidMessengerRepositoryProvider.get(context),
+                                        imported.userId, pinned.publisher, latest)
+                                    latest.publisher?.let { ContactPublisherStore(context).put(imported.userId, it) }
+                                }
+                            }
+                            imported.alias
                         }
                     }
                     inviteBusy = false
@@ -393,6 +431,7 @@ fun EidoHomeApp(
             portable = EidoOnionNode.portable,
             onEditProfile = { showService = false; editingProfile = true },
             onOpenAdvanced = onOpenAdvanced,
+            onOpenBackup = { showService = false; showBackup = true },
             onBack = { showService = false },
         )
         return
@@ -400,6 +439,7 @@ fun EidoHomeApp(
 
     Scaffold(
         topBar = {
+            Column {
             TopAppBarWithProfile(
                 profile!!,
                 onRefresh = {
@@ -449,6 +489,8 @@ fun EidoHomeApp(
                 back = openChat?.let { { openChat = null } },
                 titleOverride = openChat?.title,
             )
+            TextButton(onClick = { showBackup = true }, modifier = Modifier.fillMaxWidth()) { BackupStatusText() }
+            }
         },
         bottomBar = {
             NavigationBar {
@@ -805,6 +847,7 @@ private fun ServiceScreen(
     portable: Boolean,
     onEditProfile: () -> Unit,
     onOpenAdvanced: () -> Unit,
+    onOpenBackup: () -> Unit,
     onBack: () -> Unit,
 ) {
     androidx.activity.compose.BackHandler(onBack = onBack)
@@ -826,6 +869,7 @@ private fun ServiceScreen(
                         nickname = profile.nickname,
                         avatarPng = profile.avatarPng,
                         onion = EidoOnionNode.address.orEmpty(),
+                    context = context,
                     ).toByteArray(Charsets.UTF_8)
                 )
             }
@@ -909,6 +953,12 @@ private fun ServiceScreen(
             }
             HorizontalDivider()
             ListItem(
+                headlineContent = { Text("Резервная копия профиля") },
+                supportingContent = { BackupStatusText() },
+                modifier = Modifier.clickable(onClick = onOpenBackup),
+            )
+            HorizontalDivider()
+            ListItem(
                 headlineContent = { Text("Устройства, архивы, диагностика") },
                 supportingContent = { Text("Протокольные экраны R22") },
                 modifier = Modifier.clickable(onClick = onOpenAdvanced),
@@ -917,10 +967,12 @@ private fun ServiceScreen(
             Spacer(Modifier.height(16.dp))
             Text(
                 if (portable) {
-                    "Ваш адрес в сети выведен из секрета восстановления — он переживёт переустановку."
+                    "При удалении приложения выберите «Сохранить данные», чтобы сохранить профиль, " +
+                        "контакты и переписку для переустановки. Полное удаление стирает также ключи. " +
+                        "Одной визитки или адреса недостаточно для восстановления."
                 } else {
-                    "Внимание: адрес не выводится из секрета восстановления и будет потерян при " +
-                        "переустановке. Контакты перестанут вас находить."
+                    "При удалении выберите «Сохранить данные». Без сохранения данных или заранее " +
+                        "подготовленного восстановления профиль и переписка будут потеряны."
                 },
                 style = MaterialTheme.typography.bodySmall,
             )
@@ -1099,6 +1151,7 @@ private fun ContactsTab(
                     nickname = me?.nickname.orEmpty(),
                     avatarPng = me?.avatarPng,
                     onion = EidoOnionNode.address.orEmpty(),
+                    context = context,
                 )
                 it.write(card.toByteArray(Charsets.UTF_8))
             }
@@ -1152,6 +1205,7 @@ private fun ContactsTab(
                                 nickname = me?.nickname.orEmpty(),
                                 avatarPng = me?.avatarPng,
                                 onion = EidoOnionNode.address.orEmpty(),
+                    context = context,
                             )
                             when (Relay.claimDirectory(card, visible = want)) {
                                 200 -> {
@@ -1262,6 +1316,9 @@ private fun importCard(
     card: ContactCard.Parsed,
 ): ContactSummary {
     val summary = importWithHandle(service, card)
+    if (card.deviceState != null && card.publisher != null) {
+        adoptRecoveredContact(service, AndroidMessengerRepositoryProvider.get(context), summary.userId, card.publisher, card)
+    }
     card.publisher?.let { ContactPublisherStore(context).put(summary.userId, it) }
     ContactOnionStore(context).put(summary.userId, card.onion)
     card.avatarPng?.let { ContactAvatarStore(context).put(summary.userId, it) }

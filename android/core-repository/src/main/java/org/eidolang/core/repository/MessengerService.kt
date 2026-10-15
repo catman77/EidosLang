@@ -73,21 +73,29 @@ class LocalMessengerService(
     }
 
     /**
-     * Bootstrap a fresh device from the latest root-signed roster snapshot. A device with
-     * existing roster state must still follow the exact epoch/hash chain.
+     * Accept an owner-signed snapshot after offline recovery. Cached epochs and revocations cannot
+     * roll back. Single-step updates retain the previous-hash check; ordinary import remains strict.
      */
     fun importDeviceRosterSnapshot(rosterCanonicalJson: String, importedAtMs: Long): UserDeviceRosterV1 {
         val roster = DeviceRosterCanonical.parseCanonical(rosterCanonicalJson)
         val user = knownUser(roster.body.userId)
         val previous = latestRoster(roster.body.userId)
         val knownIds = knownBundles(roster.body.userId).mapTo(linkedSetOf()) { it.device.deviceId }
-        if (previous == null) {
-            require(DeviceRosterVerifier.verifySignature(roster, user)) { "Invalid root-signed device roster" }
-            require((roster.body.activeDeviceIds + roster.body.revokedDeviceIds).all { it in knownIds }) {
-                "Roster references unknown device certificate"
+        require(DeviceRosterVerifier.verifySignature(roster, user)) { "Invalid root-signed device roster" }
+        require((roster.body.activeDeviceIds + roster.body.revokedDeviceIds).all { it in knownIds }) {
+            "Roster references unknown device certificate"
+        }
+        if (previous != null) {
+            require(DeviceRosterVerifier.verifySignature(previous, user)) { "Invalid cached device roster" }
+            if (roster.rosterId != previous.rosterId) {
+                require(DeviceRosterVerifier.verifySignature(roster, user)) { "Invalid root-signed device roster" }
+                require(roster.body.epoch > previous.body.epoch) { "Roster snapshot rollback" }
+                require((roster.body.activeDeviceIds + roster.body.revokedDeviceIds).all { it in knownIds })
+                require(roster.body.revokedDeviceIds.containsAll(previous.body.revokedDeviceIds)) { "Revocation set cannot shrink" }
+                require((previous.body.revokedDeviceIds.toSet() intersect roster.body.activeDeviceIds.toSet()).isEmpty())
+                if (roster.body.epoch == previous.body.epoch + 1)
+                    require(roster.body.previousRosterId == previous.rosterId) { "Roster chain discontinuity" }
             }
-        } else {
-            DeviceRosterVerifier.advance(previous, roster, user, knownIds)
         }
         repository.putDeviceRoster(
             DeviceRosterRecord(roster.body.userId, roster.body.epoch, roster.rosterId, rosterCanonicalJson, importedAtMs)
@@ -477,8 +485,7 @@ class LocalMessengerService(
         // R20.2 recovery records are authenticated under an independent history-vault domain.
         // They are a fallback only when the immutable R15 envelope has no usable local key box
         // or R20 historical grant. Message identity/signature is still verified separately.
-        // Vault recovery hands back documents only, so a recovered message shows no caption.
-        historicalDocumentProvider?.documentFor(message.messageId)?.let { return EidoMessagePayloadV1(it, "") }
+        historicalDocumentProvider?.payloadFor(message.messageId)?.let { return it }
         error("No local recipient key box, historical key grant, or authenticated history-vault record")
     }
 

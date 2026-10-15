@@ -165,7 +165,7 @@ object HistoryVaultEntryCodec {
         val messageRaw=o.str("message_envelope_json")
         val docRaw=o.str("document_json")
         MessageParser.parseCanonical(messageRaw)
-        val doc=EidogramParser.parseCanonical(docRaw)
+        val doc=org.eidolang.core.canonical.EidoMessagePayloadCanonical.parseCanonical(docRaw).document
         val out=HistoryVaultEntryPayloadV1(messageRaw,docRaw,o.str("document_content_hash"))
         require(EidogramCanonical.contentHash(doc)==out.documentContentHash)
         require(payloadJson(out)==text)

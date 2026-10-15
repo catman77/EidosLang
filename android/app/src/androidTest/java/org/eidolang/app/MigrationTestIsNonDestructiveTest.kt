@@ -6,18 +6,7 @@ import org.eidolang.core.repository.AndroidSqliteMessengerRepository
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-/**
- * The migration test must give the device back what it found.
- *
- * `SqliteV3MigrationTest` builds its legacy database at the *production* path, so its
- * `deleteDatabase` calls destroy a real installation's contacts, conversations and messages. It did
- * exactly that to a tablet during a regression run, and the missing rows then presented as a
- * delivery bug — the sender published, the recipient had no contact left to poll, and nothing
- * anywhere said a database had been deleted.
- *
- * This writes a marker row, runs the destructive test's own before/after cycle through JUnit, and
- * checks the marker is still there. Asserting on the guard rather than trusting the comment.
- */
+/** The migration fixture uses a separate database and must leave existing messenger rows intact. */
 class MigrationTestIsNonDestructiveTest {
 
     private val ctx = InstrumentationRegistry.getInstrumentation().targetContext

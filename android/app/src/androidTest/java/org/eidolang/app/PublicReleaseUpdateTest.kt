@@ -80,7 +80,19 @@ class PublicReleaseUpdateTest {
         assertEquals("Проверка обновления GitHub", profile.nickname)
         assertEquals(snapshot.getString("avatar"), HexSha256.of(profile.avatarPng!!))
         repo().use { repository ->
-            val service = LocalMessengerService(repository, identity)
+            // LocalMessengerService registers its own device in its constructor. Verification must
+            // read the phone's repository without issuing that write, so run it against a mirror.
+            val mirror = InMemoryMessengerRepository().apply {
+                repository.contactDevices().forEach(::putContact)
+                repository.ownDevices().forEach(::putOwnDevice)
+                repository.deviceRosters().forEach(::putDeviceRoster)
+                repository.keyGrants().forEach(::putKeyGrant)
+                repository.conversations().forEach { conversation ->
+                    putConversation(conversation)
+                    repository.messages(conversation.conversationId).forEach(::insertMessage)
+                }
+            }
+            val service = LocalMessengerService(mirror, identity)
             assertEquals("Тестовый собеседник", service.contactSummaries().single().alias)
             val conversation = snapshot.getString("conversation")
             assertEquals("Проверка сохранности переписки", service.conversationSummaries().single().title)
@@ -96,6 +108,8 @@ class PublicReleaseUpdateTest {
             val challenge = "public-release-update-check".toByteArray(Charsets.UTF_8)
             assertTrue(JcaCrypto.verify(PublicKeyCodec.ec(identity.certificate.body.signingPublicKeyB64),
                 challenge, identity.signMessage(challenge)))
+            assertTrue(JcaCrypto.verify(PublicKeyCodec.ec(identity.user.rootSigningPublicKeyB64),
+                challenge, AndroidRootAuthority().signRoot(challenge)))
         }
     }
 }
