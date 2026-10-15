@@ -42,13 +42,43 @@ jobs:
         run: gradle :core-model:testDebugUnitTest :core-canonical:testDebugUnitTest --no-daemon
 
       - name: Build debug APK
+        if: github.event_name == 'pull_request'
         working-directory: android
         run: gradle :app:assembleDebug --no-daemon
 
+      - name: Restore distribution signing key
+        if: github.event_name != 'pull_request'
+        uses: ./.github/actions/android-signing
+        with:
+          keystore-base64: ${{ secrets.EIDOLANG_KEYSTORE_BASE64 }}
+
+      - name: Build signed release APK
+        if: github.event_name != 'pull_request'
+        working-directory: android
+        env:
+          EIDOLANG_STORE_PASSWORD: ${{ secrets.EIDOLANG_STORE_PASSWORD }}
+          EIDOLANG_KEY_ALIAS: ${{ secrets.EIDOLANG_KEY_ALIAS }}
+          EIDOLANG_KEY_PASSWORD: ${{ secrets.EIDOLANG_KEY_PASSWORD }}
+        run: gradle :app:assembleRelease --no-daemon
+
+      - name: Verify distribution signing certificate
+        if: github.event_name != 'pull_request'
+        run: bash android/tools/verify-apk-signature.sh android/app/build/outputs/apk/release/app-release.apk
+
+      - name: Remove signing key from runner
+        if: always() && github.event_name != 'pull_request'
+        run: rm -f "$RUNNER_TEMP/eidolang-signing.keystore"
+
       - name: Name the artefact after the commit
         id: apk
+        env:
+          IS_PULL_REQUEST: ${{ github.event_name == 'pull_request' }}
         run: |
-          SRC=android/app/build/outputs/apk/debug/app-debug.apk
+          if [[ "$IS_PULL_REQUEST" == 'true' ]]; then
+            SRC=android/app/build/outputs/apk/debug/app-debug.apk
+          else
+            SRC=android/app/build/outputs/apk/release/app-release.apk
+          fi
           OUT="eidolang-${GITHUB_SHA::7}.apk"
           cp "$SRC" "$OUT"
           echo "path=$OUT" >> "$GITHUB_OUTPUT"
@@ -56,7 +86,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: eidolang-debug-apk
+          name: ${{ github.event_name == 'pull_request' && 'eidolang-debug-apk' || 'eidolang-release-apk' }}
           path: ${{ steps.apk.outputs.path }}
           retention-days: 30
 
@@ -70,9 +100,9 @@ jobs:
           gh release delete latest --yes --cleanup-tag 2>/dev/null || true
           gh release create latest "${{ steps.apk.outputs.path }}" \
             --title "Последняя сборка" \
-            --notes "Отладочная сборка из \`${GITHUB_SHA::7}\`, ${{ steps.apk.outputs.size }}.
+            --notes "Сборка из \`${GITHUB_SHA::7}\`, ${{ steps.apk.outputs.size }}.
           Скачайте APK ниже и установите на Android 8.0 или новее.
-          Это отладочная подпись: при первой установке Android предупредит о неизвестном источнике." \
+          APK подписан постоянным ключом EidoLang; обновление сохраняет данные при совпадении подписи установленной версии." \
             --prerelease
 
       - name: Publish a tagged release

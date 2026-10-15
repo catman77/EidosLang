@@ -32,12 +32,27 @@ jobs:
           ref: ${{ inputs.release_tag }}
           persist-credentials: false
 
+      - name: Restore distribution signing key
+        uses: ./.github/actions/android-signing
+        with:
+          keystore-base64: ${{ secrets.EIDOLANG_KEYSTORE_BASE64 }}
+
       # The runner provides JDK 21, Android SDK 37 and Gradle 9.5.0.
       - name: Unit tests and APK build
         working-directory: android
         env:
           TMPDIR: ${{ runner.temp }}
-        run: gradle :core-model:testDebugUnitTest :core-canonical:testDebugUnitTest :app:assembleDebug --no-daemon -Djava.io.tmpdir="$TMPDIR"
+          EIDOLANG_STORE_PASSWORD: ${{ secrets.EIDOLANG_STORE_PASSWORD }}
+          EIDOLANG_KEY_ALIAS: ${{ secrets.EIDOLANG_KEY_ALIAS }}
+          EIDOLANG_KEY_PASSWORD: ${{ secrets.EIDOLANG_KEY_PASSWORD }}
+        run: gradle :core-model:testDebugUnitTest :core-canonical:testDebugUnitTest :app:assembleRelease --no-daemon -Djava.io.tmpdir="$TMPDIR"
+
+      - name: Verify distribution signing certificate
+        run: bash android/tools/verify-apk-signature.sh android/app/build/outputs/apk/release/app-release.apk
+
+      - name: Remove signing key from runner
+        if: always()
+        run: rm -f "$RUNNER_TEMP/eidolang-signing.keystore"
 
       - name: Publish versioned APK
         uses: actions/github-script@v7
@@ -46,17 +61,17 @@ jobs:
             const fs = require('fs');
             const cp = require('child_process');
             const tag = process.env.RELEASE_TAG;
-            const metadata = JSON.parse(fs.readFileSync('android/app/build/outputs/apk/debug/output-metadata.json'));
+            const metadata = JSON.parse(fs.readFileSync('android/app/build/outputs/apk/release/output-metadata.json'));
             const version = metadata.elements[0].versionName;
             if (tag !== `v${version}`) throw new Error('Tag and APK version differ');
             const sha = cp.execFileSync('git', ['rev-parse', 'HEAD'], {encoding: 'utf8'}).trim();
             const name = `eidolang-${version}-${sha.slice(0, 7)}.apk`;
-            const data = fs.readFileSync('android/app/build/outputs/apk/debug/app-debug.apk');
+            const data = fs.readFileSync('android/app/build/outputs/apk/release/app-release.apk');
             const {owner, repo} = context.repo;
             const generated = (await github.rest.repos.generateReleaseNotes({owner, repo, tag_name: tag})).data;
             const body = `${generated.body}\n\n` +
               `Собрано из ${sha} через GitHub Actions на собственном runner. JVM-тесты прошли.\n\n` +
-              'APK имеет отладочную подпись. Нужен Android 8.0 или новее.';
+              'APK подписан постоянным ключом EidoLang. Нужен Android 8.0 или новее.';
             let release;
             try {
               release = (await github.rest.repos.getReleaseByTag({owner, repo, tag})).data;

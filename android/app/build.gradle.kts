@@ -3,6 +3,13 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+// Distribution builds must use the same private key on every runner. Keep the certificate used
+// by the existing GitHub APKs so these builds can update them without removing user data.
+val signingVariables = listOf(
+    "EIDOLANG_KEYSTORE_FILE", "EIDOLANG_STORE_PASSWORD", "EIDOLANG_KEY_ALIAS", "EIDOLANG_KEY_PASSWORD",
+).associateWith { providers.environmentVariable(it).orNull }
+val releaseSigningConfigured = signingVariables.values.all { !it.isNullOrBlank() }
+
 android {
     namespace = "org.eidolang.app"
     compileSdk = 37
@@ -11,11 +18,25 @@ android {
         applicationId = "org.eidolang.app"
         minSdk = 26
         targetSdk = 37
-        versionCode = 2
-        versionName = "0.1-R22.1"
+        versionCode = 3
+        versionName = "0.1-R22.2"
         // Two-device enrollment is driven by tools/two-device-enrollment.sh, not by this suite.
         testInstrumentationRunnerArguments["notAnnotation"] =
             "org.eidolang.app.TwoDeviceOnly,org.eidolang.app.NativeSessionHeavy"
+    }
+
+    signingConfigs {
+        create("distribution") {
+            storeFile = signingVariables["EIDOLANG_KEYSTORE_FILE"]?.let { file(it) }
+            storePassword = signingVariables["EIDOLANG_STORE_PASSWORD"]
+            keyAlias = signingVariables["EIDOLANG_KEY_ALIAS"]
+            keyPassword = signingVariables["EIDOLANG_KEY_PASSWORD"]
+        }
+    }
+    buildTypes {
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("distribution")
+        }
     }
 
     buildFeatures { compose = true }
@@ -24,6 +45,17 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 }
+
+val validateReleaseSigning by tasks.registering {
+    doLast {
+        check(releaseSigningConfigured) {
+            "Release signing requires " + signingVariables.keys.joinToString() +
+                ". Refusing to build an unsigned distribution APK."
+        }
+    }
+}
+tasks.matching { it.name == "preReleaseBuild" || it.name == "validateSigningRelease" }
+    .configureEach { dependsOn(validateReleaseSigning) }
 
 dependencies {
     implementation(project(":feature-editor"))
