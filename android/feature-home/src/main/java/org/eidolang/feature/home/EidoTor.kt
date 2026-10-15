@@ -36,12 +36,16 @@ object OnionServiceKey {
     /** The domain string. Changing it changes every derived address, so it is frozen here. */
     private const val DOMAIN = "eidolang.onion.v1"
 
-    fun fromRecoverySecret(secret: ByteArray): String {
+    fun fromRecoverySecret(secret: ByteArray, deviceId: String? = null): String {
         require(secret.size == 32) { "recovery secret must be 32 bytes" }
+        require(deviceId == null || deviceId.matches(Regex("dev:[0-9a-f]{64}"))) { "invalid device id" }
         val mac = javax.crypto.Mac.getInstance("HmacSHA256").apply {
             init(javax.crypto.spec.SecretKeySpec(secret, "HmacSHA256"))
         }
-        return blobFromSeed(mac.doFinal(DOMAIN.toByteArray(Charsets.US_ASCII)))
+        // Preserve every original primary address. A parallel device sharing the history secret
+        // needs its own address so the two live Tor services do not overwrite each other.
+        val domain = if (deviceId == null) DOMAIN else "$DOMAIN.secondary.v1|$deviceId"
+        return blobFromSeed(mac.doFinal(domain.toByteArray(Charsets.US_ASCII)))
     }
 
     /**
@@ -83,9 +87,12 @@ class EidoTor private constructor(
     private val keyFile: File,
     private val country: String,
     private val appContext: Context,
+    private val ports: Ports,
 ) {
 
-    /** Port the onion service advertises; the local socket it forwards to is [LOCAL_PORT]. */
+    data class Ports(val local: Int, val socks: Int, val control: Int)
+
+    /** Port the onion service advertises; [ports] selects the installation's local socket. */
     val onionPort: Int get() = ONION_PORT
 
     @Volatile
@@ -171,7 +178,7 @@ class EidoTor private constructor(
         // *second* is the virtual port on the onion. Passing them in named order publishes a service
         // on onion port 6883 forwarding to local port 80, where nothing listens, and every connection
         // comes back as SOCKS "connection refused" — indistinguishable from a firewall.
-        val props = tor.publishHiddenService(LOCAL_PORT, ONION_PORT, existing?.takeIf { it.isNotEmpty() })
+        val props = tor.publishHiddenService(ports.local, ONION_PORT, existing?.takeIf { it.isNotEmpty() })
         // Sealed either way: a derived key is cheap to recompute but the secret it comes from is not
         // always to hand, and Tor needs the blob on every launch.
         if (existing.isNullOrEmpty() || derivedKey != null) writeKey(props.privKey)
@@ -264,6 +271,18 @@ class EidoTor private constructor(
         const val SOCKS_PORT = 59050
         const val CONTROL_PORT = 59051
 
+        @Volatile
+        var currentPorts = Ports(LOCAL_PORT, SOCKS_PORT, CONTROL_PORT)
+            private set
+
+        fun portsFor(packageName: String): Ports =
+            if (packageName == "org.eidolang.app.migration") Ports(6884, 59052, 59053)
+            else Ports(LOCAL_PORT, SOCKS_PORT, CONTROL_PORT)
+
+        fun configurePorts(context: Context) {
+            currentPorts = portsFor(context.packageName)
+        }
+
         private const val POLL_MS = 1_000L
         private const val DIRECT_TIMEOUT_MS = 60_000L
         private const val DIRECT_PROBE_MS = 20_000L
@@ -284,14 +303,16 @@ class EidoTor private constructor(
 
         private fun build(context: Context): EidoTor {
             val app = context.applicationContext as Application
+            configurePorts(app)
+            val ports = currentPorts
             val io = Executors.newCachedThreadPool()
             val dir = File(app.filesDir, "tor").apply { mkdirs() }
             // The ABI names the folder the binary sits in inside tor-android.
             val architecture = Build.SUPPORTED_ABIS.firstOrNull() ?: "arm64-v8a"
             val wrapper = AndroidTorWrapper(
-                app, WakeLocks(app), io, io, architecture, dir, SOCKS_PORT, CONTROL_PORT,
+                app, WakeLocks(app), io, io, architecture, dir, ports.socks, ports.control,
             )
-            return EidoTor(wrapper, File(dir, "onion-service-key.txt"), countryOf(app), app)
+            return EidoTor(wrapper, File(dir, "onion-service-key.txt"), countryOf(app), app, ports)
         }
 
         /**

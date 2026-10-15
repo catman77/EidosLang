@@ -48,6 +48,7 @@ fun EidoHomeApp(
     /** An `eidolang://invite/...` link the user opened, if the app was started by one. */
     inviteLink: String? = null,
     onInviteHandled: () -> Unit = {},
+    startWithChats: Boolean = false,
 ) {
     val context = LocalContext.current
     val profileStore = remember { EidoProfileStore(context) }
@@ -78,14 +79,27 @@ fun EidoHomeApp(
         return
     }
 
+    val restoredHistory = remember { runCatching { RestoredHistory.open(context) } }
+    DisposableEffect(restoredHistory) {
+        onDispose { restoredHistory.getOrNull()?.close() }
+    }
+    if (restoredHistory.isFailure) {
+        Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text("Не удалось открыть восстановленную историю", style = MaterialTheme.typography.titleLarge)
+            Text(restoredHistory.exceptionOrNull()?.message.orEmpty())
+            Button(onClick = onOpenAdvanced) { Text("Открыть архив и восстановление") }
+        }
+        return
+    }
     val service = remember {
         LocalMessengerService(
             AndroidMessengerRepositoryProvider.get(context),
             identity, SecureRandom(),
+            historicalDocumentProvider = restoredHistory.getOrNull(),
         )
     }
 
-    var tab by remember { mutableStateOf(0) }
+    var tab by remember { mutableStateOf(if (startWithChats) 1 else 0) }
     var composing by remember { mutableStateOf<ComposeTarget?>(null) }
     var sending by remember { mutableStateOf<SendProgress?>(null) }
     var entries by remember { mutableStateOf(catalog.list()) }

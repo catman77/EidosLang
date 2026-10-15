@@ -59,11 +59,13 @@ jobs:
           EIDOLANG_STORE_PASSWORD: ${{ secrets.EIDOLANG_STORE_PASSWORD }}
           EIDOLANG_KEY_ALIAS: ${{ secrets.EIDOLANG_KEY_ALIAS }}
           EIDOLANG_KEY_PASSWORD: ${{ secrets.EIDOLANG_KEY_PASSWORD }}
-        run: gradle :app:assembleRelease --no-daemon
+        run: gradle :app:assembleRelease :app:assembleMigration --no-daemon
 
       - name: Verify distribution signing certificate
         if: github.event_name != 'pull_request'
-        run: bash android/tools/verify-apk-signature.sh android/app/build/outputs/apk/release/app-release.apk
+        run: |
+          bash android/tools/verify-apk-signature.sh android/app/build/outputs/apk/release/app-release.apk
+          bash android/tools/verify-apk-signature.sh android/app/build/outputs/apk/migration/app-migration.apk
 
       - name: Remove signing key from runner
         if: always() && github.event_name != 'pull_request'
@@ -83,11 +85,18 @@ jobs:
           cp "$SRC" "$OUT"
           echo "path=$OUT" >> "$GITHUB_OUTPUT"
           echo "size=$(du -h "$OUT" | cut -f1)" >> "$GITHUB_OUTPUT"
+          if [[ "$IS_PULL_REQUEST" != 'true' ]]; then
+            MIGRATION_OUT="eidolang-${GITHUB_SHA::7}-migration.apk"
+            cp android/app/build/outputs/apk/migration/app-migration.apk "$MIGRATION_OUT"
+            echo "migration_path=$MIGRATION_OUT" >> "$GITHUB_OUTPUT"
+          fi
 
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ github.event_name == 'pull_request' && 'eidolang-debug-apk' || 'eidolang-release-apk' }}
-          path: ${{ steps.apk.outputs.path }}
+          path: |
+            ${{ steps.apk.outputs.path }}
+            ${{ steps.apk.outputs.migration_path }}
           retention-days: 30
 
       # A rolling "latest" release, so there is always one stable URL to send somebody who just
@@ -98,15 +107,16 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete latest --yes --cleanup-tag 2>/dev/null || true
-          gh release create latest "${{ steps.apk.outputs.path }}" \
+          gh release create latest "${{ steps.apk.outputs.path }}" "${{ steps.apk.outputs.migration_path }}" \
             --title "Последняя сборка" \
             --notes "Сборка из \`${GITHUB_SHA::7}\`, ${{ steps.apk.outputs.size }}.
           Скачайте APK ниже и установите на Android 8.0 или новее.
-          APK подписан постоянным ключом EidoLang; обновление сохраняет данные при совпадении подписи установленной версии." \
+          Обычный APK обновляет версии с постоянной подписью.
+          Для первой публичной версии с другой подписью используйте APK с суффиксом -migration: он устанавливается рядом и подключается как дополнительное устройство. Старое приложение хранит основной ключ и полную переписку; его нужно сохранить. Порядок подключения описан в README." \
             --prerelease
 
       - name: Publish a tagged release
         if: startsWith(github.ref, 'refs/tags/v')
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "${GITHUB_REF_NAME}" "${{ steps.apk.outputs.path }}" --generate-notes
+        run: gh release create "${GITHUB_REF_NAME}" "${{ steps.apk.outputs.path }}" "${{ steps.apk.outputs.migration_path }}" --generate-notes

@@ -3,19 +3,20 @@ package org.eidolang.feature.onboarding
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import org.eidolang.core.crypto.*
-import org.eidolang.core.hardening.AndroidRepositoryTextProtector
 import org.eidolang.core.multidevice.AndroidSecondaryDeviceIdentityStore
-import org.eidolang.core.repository.AndroidSqliteMessengerRepository
-import org.eidolang.core.repository.LocalMessengerService
 
 @Composable
 fun EidoRootApp(
+    allowPrimaryCreation: Boolean = true,
+    prepareOwnerIdentity: (String) -> String = { it },
     onReady: @Composable (DevicePrivateCrypto) -> Unit,
 ) {
     val context=LocalContext.current
@@ -23,7 +24,7 @@ fun EidoRootApp(
     val secondaryStore=remember{AndroidSecondaryDeviceIdentityStore(context)}
     var identity by remember {
         mutableStateOf<DevicePrivateCrypto?>(
-            primaryStore.loadIfPresent() ?: secondaryStore.load()
+            primaryStore.loadIfPresent() ?: SecondaryEnrollment.readyIdentity(context)
         )
     }
 
@@ -50,6 +51,8 @@ fun EidoRootApp(
         FirstRunOnboarding(
             primaryStore=primaryStore,
             secondaryStore=secondaryStore,
+            allowPrimaryCreation=allowPrimaryCreation,
+            prepareOwnerIdentity=prepareOwnerIdentity,
             onReady={identity=it},
         )
     }
@@ -60,13 +63,15 @@ fun EidoRootApp(
 private fun FirstRunOnboarding(
     primaryStore:AndroidKeystoreIdentityStore,
     secondaryStore:AndroidSecondaryDeviceIdentityStore,
+    allowPrimaryCreation: Boolean,
+    prepareOwnerIdentity: (String) -> String,
     onReady:(DevicePrivateCrypto)->Unit,
 ) {
     val context=LocalContext.current
-    var secondaryMode by remember{mutableStateOf(false)}
-    var ownerBundleRaw by remember{mutableStateOf<String?>(null)}
-    var requestRaw by remember{mutableStateOf<String?>(null)}
-    var installedSecondary by remember{mutableStateOf<DevicePrivateCrypto?>(null)}
+    var ownerBundleRaw by remember{mutableStateOf(secondaryStore.enrollmentOwnerCanonical())}
+    var secondaryMode by remember{mutableStateOf(!allowPrimaryCreation || ownerBundleRaw != null || secondaryStore.load() != null)}
+    var requestRaw by remember{mutableStateOf(ownerBundleRaw?.let(secondaryStore::createEnrollmentRequest))}
+    var installedSecondary by remember{mutableStateOf(secondaryStore.load())}
     var status by remember{mutableStateOf<String?>(null)}
 
     fun read(uri:android.net.Uri):String =
@@ -76,7 +81,7 @@ private fun FirstRunOnboarding(
     val ownerImport=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()){uri->
         if(uri!=null){
             runCatching{
-                val raw=read(uri)
+                val raw=prepareOwnerIdentity(read(uri))
                 IdentityParser.parsePublicBundleCanonical(raw)
                 ownerBundleRaw=raw
                 requestRaw=secondaryStore.createEnrollmentRequest(raw)
@@ -100,6 +105,7 @@ private fun FirstRunOnboarding(
     val approvalImport=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()){uri->
         if(uri!=null){
             runCatching{
+                require(ownerBundleRaw != null) { "Сначала выберите визитку основного профиля" }
                 secondaryStore.installAuthorizedBundle(read(uri))
             }.onSuccess{
                 installedSecondary=it
@@ -112,14 +118,7 @@ private fun FirstRunOnboarding(
         val ownerRaw=ownerBundleRaw
         if(uri!=null && identity!=null && ownerRaw!=null){
             runCatching{
-                AndroidSqliteMessengerRepository(
-                    context,AndroidRepositoryTextProtector(context)
-                ).use { repo ->
-                    val service=LocalMessengerService(repo,identity)
-                    service.importOwnDevice(ownerRaw,System.currentTimeMillis())
-                    service.importDeviceRosterSnapshot(read(uri),System.currentTimeMillis())
-                }
-                identity
+                SecondaryEnrollment.complete(context, read(uri))
             }.onSuccess{
                 status="Secondary device полностью авторизован"
                 onReady(it)
@@ -131,13 +130,24 @@ private fun FirstRunOnboarding(
         topBar={TopAppBar(title={Text("Первый запуск")})}
     ){padding->
         Column(
-            Modifier.padding(padding).padding(24.dp).fillMaxSize(),
+            Modifier.padding(padding).padding(24.dp).fillMaxSize().verticalScroll(rememberScrollState()),
             verticalArrangement=Arrangement.spacedBy(12.dp)
         ){
             Text(
-                "Выберите роль этой установки. Выбор определяет, создаётся ли новый user root " +
-                    "или устройство присоединяется к уже существующему user identity."
+                if (!allowPrimaryCreation)
+                    "Подключите эту установку к прежнему профилю. Сначала сохраните свою визитку " +
+                        "из старого приложения и выберите её здесь. Старое приложение остаётся основным."
+                else
+                    "Выберите роль этой установки. Выбор определяет, создаётся ли новый user root " +
+                        "или устройство присоединяется к уже существующему user identity."
             )
+            if (!allowPrimaryCreation) {
+                Text(
+                    "Полная переписка остаётся в старом приложении. Его архив переносит эйдограммы, " +
+                        "но не текстовые подписи к старым сообщениям.",
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
             status?.let{Text(it,color=MaterialTheme.colorScheme.onSurfaceVariant)}
 
             if(!secondaryMode){
@@ -151,28 +161,30 @@ private fun FirstRunOnboarding(
                     Text("Подключить как дополнительное устройство")
                 }
             }else{
-                Button(onClick={ownerImport.launch(arrayOf("application/json"))}){
-                    Text(if(ownerBundleRaw==null)"1. Импортировать identity владельца" else "1. Identity владельца импортирована")
+                Button(onClick={ownerImport.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))}){
+                    Text(if(ownerBundleRaw==null)"1. Выбрать визитку своего профиля" else "1. Визитка профиля выбрана")
                 }
                 Button(
                     enabled=requestRaw!=null,
                     onClick={requestExport.launch("eidolang-device-enrollment-request.json")}
-                ){Text("2. Экспортировать enrollment request")}
+                ){Text("2. Сохранить запрос на подключение")}
 
                 Text(
-                    "На уже авторизованном основном устройстве импортируйте request, " +
-                        "подпишите новое устройство и экспортируйте device bundle + roster."
+                    "В старом приложении откройте «Ещё» → «Устройства» и авторизуйте сохранённый запрос. " +
+                        "Сохраните разрешение (device bundle) и список устройств (roster), затем выберите их здесь."
                 )
 
                 Button(onClick={approvalImport.launch(arrayOf("application/json"))}){
-                    Text(if(installedSecondary==null)"3. Импортировать authorized device bundle" else "3. Device bundle установлен")
+                    Text(if(installedSecondary==null)"3. Выбрать разрешение на подключение" else "3. Разрешение проверено")
                 }
                 Button(
                     enabled=installedSecondary!=null && ownerBundleRaw!=null,
                     onClick={rosterImport.launch(arrayOf("application/json"))}
-                ){Text("4. Импортировать root-signed roster")}
+                ){Text("4. Выбрать список устройств")}
 
-                TextButton(onClick={secondaryMode=false}){Text("← Назад")}
+                if (allowPrimaryCreation && installedSecondary == null) {
+                    TextButton(onClick={secondaryMode=false}){Text("← Назад")}
+                }
             }
         }
     }

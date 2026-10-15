@@ -3,6 +3,7 @@ package org.eidolang.feature.home
 import android.content.Context
 import org.eidolang.core.archive.SegmentParser
 import org.eidolang.core.vault.AndroidBootstrapRecoverySecret
+import org.eidolang.core.multidevice.AndroidSecondaryDeviceIdentityStore
 import org.eidolang.core.transport.FetchResult
 import org.eidolang.core.transport.SwarmObject
 import org.eidolang.core.transport.TransportFile
@@ -306,6 +307,7 @@ object EidoOnionNode {
         private set
 
     fun ensureStarted(context: Context) {
+        EidoTor.configurePorts(context)
         if (started) return
         synchronized(this) {
             if (started) return
@@ -316,11 +318,11 @@ object EidoOnionNode {
                     val store = OnionStore(app)
                     EidoProfileStore(app).load()?.avatarPng?.let { store.putAvatar(it) }
                     val ledger = DeliveryLedger(app)
-                    EidoOnionServer(store) { infoHash, path ->
+                    EidoOnionServer(store, port = EidoTor.portsFor(app.packageName).local) { infoHash, path ->
                         ledger.served(infoHash, path, System.currentTimeMillis())
                     }.start()
                     val derived = derivedKey(app)
-                    portable = derived != null
+                    portable = derived != null && app.packageName != "org.eidolang.app.migration"
                     val tor = EidoTor.of(app)
                     address = tor.startAndPublish(derivedKey = derived)
                     // The routes, not just the verdict. Diagnosing why an address failed to appear
@@ -336,16 +338,23 @@ object EidoOnionNode {
     }
 
     /**
-     * The onion key derived from this installation's history-vault recovery secret, if it has one.
+     * The primary's recovery-derived key, or a device-specific key from the parallel install's
+     * local bootstrap secret. The latter deliberately stays independent of imported archives.
      *
      * Never null in practice: the secret is created at first run precisely so that the address is
-     * portable from the very first card. Null only if the Keystore itself refuses, in which case Tor
-     * falls back to a local key and [portable] says so.
+     * available from the very first card. Null only if the Keystore itself refuses, in which case
+     * Tor falls back to a local key. [portable] is only true for the primary recovery-derived route.
      */
     fun derivedKey(context: Context): String? = runCatching {
-        val raw = AndroidBootstrapRecoverySecret.forOnion(context).copyBytes()
+        // Keep the parallel device's local address stable across archive imports. Reusing the
+        // primary's recovery-derived key would give two live Tor services the same endpoint.
+        val secret = if (context.packageName == "org.eidolang.app.migration")
+            AndroidBootstrapRecoverySecret.ensure(context) else AndroidBootstrapRecoverySecret.forOnion(context)
+        val raw = secret.copyBytes()
         try {
-            OnionServiceKey.fromRecoverySecret(raw)
+            val deviceId = if (context.packageName == "org.eidolang.app.migration")
+                AndroidSecondaryDeviceIdentityStore(context).load()?.certificate?.deviceId else null
+            OnionServiceKey.fromRecoverySecret(raw, deviceId)
         } finally {
             raw.fill(0)
         }
@@ -469,7 +478,7 @@ object EidoOnionClient {
     fun get(
         onion: String,
         path: String,
-        socksPort: Int = EidoTor.SOCKS_PORT,
+        socksPort: Int = EidoTor.currentPorts.socks,
         onionPort: Int = EidoTor.ONION_PORT,
         timeoutMs: Int = 90_000,
         /**

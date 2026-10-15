@@ -45,10 +45,12 @@ jobs:
           EIDOLANG_STORE_PASSWORD: ${{ secrets.EIDOLANG_STORE_PASSWORD }}
           EIDOLANG_KEY_ALIAS: ${{ secrets.EIDOLANG_KEY_ALIAS }}
           EIDOLANG_KEY_PASSWORD: ${{ secrets.EIDOLANG_KEY_PASSWORD }}
-        run: gradle :core-model:testDebugUnitTest :core-canonical:testDebugUnitTest :app:assembleRelease --no-daemon -Djava.io.tmpdir="$TMPDIR"
+        run: gradle :core-model:testDebugUnitTest :core-canonical:testDebugUnitTest :app:assembleRelease :app:assembleMigration --no-daemon -Djava.io.tmpdir="$TMPDIR"
 
       - name: Verify distribution signing certificate
-        run: bash android/tools/verify-apk-signature.sh android/app/build/outputs/apk/release/app-release.apk
+        run: |
+          bash android/tools/verify-apk-signature.sh android/app/build/outputs/apk/release/app-release.apk
+          bash android/tools/verify-apk-signature.sh android/app/build/outputs/apk/migration/app-migration.apk
 
       - name: Remove signing key from runner
         if: always()
@@ -65,13 +67,17 @@ jobs:
             const version = metadata.elements[0].versionName;
             if (tag !== `v${version}`) throw new Error('Tag and APK version differ');
             const sha = cp.execFileSync('git', ['rev-parse', 'HEAD'], {encoding: 'utf8'}).trim();
-            const name = `eidolang-${version}-${sha.slice(0, 7)}.apk`;
-            const data = fs.readFileSync('android/app/build/outputs/apk/release/app-release.apk');
+            const outputs = [
+              [`eidolang-${version}-${sha.slice(0, 7)}.apk`, 'android/app/build/outputs/apk/release/app-release.apk'],
+              [`eidolang-${version}-${sha.slice(0, 7)}-migration.apk`, 'android/app/build/outputs/apk/migration/app-migration.apk']
+            ];
             const {owner, repo} = context.repo;
             const generated = (await github.rest.repos.generateReleaseNotes({owner, repo, tag_name: tag})).data;
             const body = `${generated.body}\n\n` +
               `Собрано из ${sha} через GitHub Actions на собственном runner. JVM-тесты прошли.\n\n` +
-              'APK подписан постоянным ключом EidoLang. Нужен Android 8.0 или новее.';
+              'APK подписаны постоянным ключом EidoLang. Нужен Android 8.0 или новее.\n\n' +
+              'APK с суффиксом -migration устанавливается рядом с первой публичной версией и подключается к прежнему профилю как дополнительное устройство. ' +
+              'Старое приложение хранит основной ключ и полную переписку; его нужно сохранить. Порядок подключения — в README.';
             let release;
             try {
               release = (await github.rest.repos.getReleaseByTag({owner, repo, tag})).data;
@@ -82,11 +88,14 @@ jobs:
                 draft: false, prerelease: false
               })).data;
             }
-            const existing = release.assets.find(asset => asset.name === name);
-            if (existing) await github.rest.repos.deleteReleaseAsset({owner, repo, asset_id: existing.id});
-            await github.rest.repos.uploadReleaseAsset({
-              owner, repo, release_id: release.id, name, data,
-              headers: {'content-type': 'application/vnd.android.package-archive', 'content-length': data.length}
-            });
+            for (const [name, path] of outputs) {
+              const data = fs.readFileSync(path);
+              const existing = release.assets.find(asset => asset.name === name);
+              if (existing) await github.rest.repos.deleteReleaseAsset({owner, repo, asset_id: existing.id});
+              await github.rest.repos.uploadReleaseAsset({
+                owner, repo, release_id: release.id, name, data,
+                headers: {'content-type': 'application/vnd.android.package-archive', 'content-length': data.length}
+              });
+            }
             await github.rest.repos.updateRelease({owner, repo, release_id: release.id, body});
             core.notice(`Published ${release.html_url}`);

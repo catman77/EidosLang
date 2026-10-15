@@ -18,8 +18,10 @@ android {
         applicationId = "org.eidolang.app"
         minSdk = 26
         targetSdk = 37
-        versionCode = 3
-        versionName = "0.1-R22.2"
+        versionCode = 4
+        versionName = "0.1-R22.3"
+        buildConfigField("boolean", "MIGRATION_INSTALL", "false")
+        manifestPlaceholders["appLabel"] = "EidoLang"
         // Two-device enrollment is driven by tools/two-device-enrollment.sh, not by this suite.
         testInstrumentationRunnerArguments["notAnnotation"] =
             "org.eidolang.app.TwoDeviceOnly,org.eidolang.app.NativeSessionHeavy"
@@ -37,9 +39,18 @@ android {
         getByName("release") {
             signingConfig = signingConfigs.getByName("distribution")
         }
+        create("migration") {
+            initWith(getByName("release"))
+            applicationIdSuffix = ".migration"
+            versionNameSuffix = "-migration"
+            matchingFallbacks += "release"
+            buildConfigField("boolean", "MIGRATION_INSTALL", "true")
+            manifestPlaceholders["appLabel"] = "EidoLang — дополнительная установка"
+        }
     }
 
-    buildFeatures { compose = true }
+    testBuildType = providers.gradleProperty("eidoTestBuildType").orElse("debug").get()
+    buildFeatures { compose = true; buildConfig = true }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -54,7 +65,9 @@ val validateReleaseSigning by tasks.registering {
         }
     }
 }
-tasks.matching { it.name == "preReleaseBuild" || it.name == "validateSigningRelease" }
+tasks.matching {
+    it.name in setOf("preReleaseBuild", "validateSigningRelease", "preMigrationBuild", "validateSigningMigration")
+}
     .configureEach { dependsOn(validateReleaseSigning) }
 
 dependencies {

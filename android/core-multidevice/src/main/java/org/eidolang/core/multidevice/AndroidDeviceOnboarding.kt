@@ -45,10 +45,18 @@ class AndroidRootAuthority : RootAuthority {
 class AndroidSecondaryDeviceIdentityStore(private val context: Context) {
     private val ks = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
     private val bundleFile = context.filesDir.resolve("eidolang-secondary-device-bundle-v1.json")
+    private val ownerFile = context.filesDir.resolve("eidolang-enrollment-owner-v1.json")
+
+    fun enrollmentOwnerCanonical(): String? = ownerFile.takeIf { it.isFile }?.readText(Charsets.UTF_8)
+        ?.also { IdentityParser.parsePublicBundleCanonical(it) }
 
     fun createEnrollmentRequest(ownerPublicBundleCanonical: String): String {
         val owner = IdentityParser.parsePublicBundleCanonical(ownerPublicBundleCanonical).user
+        load()?.let {
+            require(it.user == owner) { "This installation is already authorized for another profile" }
+        }
         ensureDeviceKeys()
+        atomicWrite(ownerFile, ownerPublicBundleCanonical)
         val signingPublic = ks.getCertificate(SIGN_ALIAS).publicKey
         val encryptionPublic = ks.getCertificate(ENC_ALIAS).publicKey
         val body = DeviceEnrollmentRequestBodyV1(
@@ -71,12 +79,17 @@ class AndroidSecondaryDeviceIdentityStore(private val context: Context) {
 
     fun installAuthorizedBundle(canonical: String): DevicePrivateCrypto {
         val bundle = IdentityParser.parsePublicBundleCanonical(canonical)
+        enrollmentOwnerCanonical()?.let {
+            require(IdentityParser.parsePublicBundleCanonical(it).user == bundle.user) {
+                "Authorization belongs to a different profile than the selected owner"
+            }
+        }
         ensureDeviceKeys()
         val localSigning = ks.getCertificate(SIGN_ALIAS).publicKey
         val localEncryption = ks.getCertificate(ENC_ALIAS).publicKey
         require(bundle.device.body.signingKeyId == "sig:" + HexSha256.of(localSigning.encoded))
         require(bundle.device.body.encryptionKeyId == "enc:" + HexSha256.of(localEncryption.encoded))
-        atomicWrite(canonical)
+        atomicWrite(bundleFile, canonical)
         return load()!!
     }
 
@@ -118,11 +131,11 @@ class AndroidSecondaryDeviceIdentityStore(private val context: Context) {
         }
     }
 
-    private fun atomicWrite(text: String) {
-        val tmp = context.filesDir.resolve(bundleFile.name + ".tmp")
+    private fun atomicWrite(file: java.io.File, text: String) {
+        val tmp = context.filesDir.resolve(file.name + ".tmp")
         tmp.writeText(text, Charsets.UTF_8)
-        if (!tmp.renameTo(bundleFile)) {
-            bundleFile.writeText(tmp.readText(Charsets.UTF_8), Charsets.UTF_8)
+        if (!tmp.renameTo(file)) {
+            file.writeText(tmp.readText(Charsets.UTF_8), Charsets.UTF_8)
             tmp.delete()
         }
     }
