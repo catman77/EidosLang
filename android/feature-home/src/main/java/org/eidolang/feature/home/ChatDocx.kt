@@ -29,6 +29,7 @@ object ChatDocx {
         items: List<TimelineItem>,
         renderer: (TimelineItem) -> Bitmap?,
         fileName: String,
+        senderName: ((TimelineItem) -> String)? = null,
     ): File {
         val images = mutableListOf<Pair<String, ByteArray>>()
         val body = StringBuilder()
@@ -41,8 +42,8 @@ object ChatDocx {
                 italic = true,
             )
         )
-        items.forEach { item ->
-            val who = if (item.outgoing) "Вы" else title
+        items.filter { it.controlCanonical == null }.forEach { item ->
+            val who = senderName?.invoke(item) ?: if (item.outgoing) "Вы" else title
             body.append(paragraph("$who · ${stamp(item.createdAtMs)}", bold = true))
             renderer(item)?.let { bitmap ->
                 val png = ByteArrayOutputStream().also { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }

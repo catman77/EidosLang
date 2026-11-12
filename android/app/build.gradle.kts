@@ -18,8 +18,8 @@ android {
         applicationId = "org.eidolang.app"
         minSdk = 26
         targetSdk = 37
-        versionCode = 6
-        versionName = "0.1-R22.5"
+        versionCode = 7
+        versionName = "0.1-R22.6"
         buildConfigField("boolean", "MIGRATION_INSTALL", "false")
         manifestPlaceholders["appLabel"] = "EidoLang"
         // Two-device enrollment is driven by tools/two-device-enrollment.sh, not by this suite.

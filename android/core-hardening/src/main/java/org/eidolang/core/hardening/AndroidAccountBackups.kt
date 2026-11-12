@@ -175,7 +175,7 @@ object AccountBackups {
         request(app)
     }
 
-    private val watchedDirectories = setOf("eidogram-catalog", "contact-avatars", "contact-publishers", "contact-onion", "delivery-ledger", "onion")
+    private val watchedDirectories = setOf("eidogram-catalog", "contact-avatars", "contact-publishers", "contact-onion", "delivery-ledger", "group-chats", "onion")
 }
 
 class AccountBackupWorker(context: Context, params: WorkerParameters) : Worker(context, params) {

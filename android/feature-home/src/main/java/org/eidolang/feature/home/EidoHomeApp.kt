@@ -29,6 +29,8 @@ import org.eidolang.feature.recovery.AccountBackupScreen
 import org.eidolang.feature.recovery.BackupStatusText
 import org.eidolang.core.repository.ContactSummary
 import org.eidolang.core.repository.LocalMessengerService
+import org.eidolang.core.repository.GroupConversationRecord
+import org.eidolang.core.message.GroupStateCodec
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -125,6 +127,12 @@ fun EidoHomeApp(
     }
 
     var tab by remember { mutableStateOf(if (startWithChats) 1 else 0) }
+    val groupService = remember(service) { groupChatService(context, service) }
+    var groupRecords by remember { mutableStateOf<List<GroupConversationRecord>>(emptyList()) }
+    var creatingGroup by remember { mutableStateOf(false) }
+    var editingGroup by remember { mutableStateOf<GroupConversationRecord?>(null) }
+    var inspectingGroup by remember { mutableStateOf<String?>(null) }
+    var leavingGroup by remember { mutableStateOf<String?>(null) }
     var composing by remember { mutableStateOf<ComposeTarget?>(null) }
     var sending by remember { mutableStateOf<SendProgress?>(null) }
     var entries by remember { mutableStateOf(catalog.list()) }
@@ -140,6 +148,7 @@ fun EidoHomeApp(
     var showService by remember { mutableStateOf(false) }
     /** The contact a composed eidogram should go straight to, when writing from inside a chat. */
     var replyTo by remember { mutableStateOf<String?>(null) }
+    var replyToGroup by remember { mutableStateOf<String?>(null) }
     /** Per contact, the newest publication instant they have collected. See [DeliveryLedger]. */
     var deliveredThrough by remember { mutableStateOf<Map<String, Long>>(emptyMap()) }
     /** This device's own invite link. Null until Tor has published the onion service. */
@@ -149,10 +158,14 @@ fun EidoHomeApp(
     fun reloadChats() {
         val delivered = deliveredThrough
         chats = runCatching {
-            service.conversationSummaries().mapNotNull { summary ->
+            groupRecords = groupService.groups()
+            val groupConversations = groupRecords.flatMap { GroupStateCodec.verifyChain(it.chain) }
+                .filter { !it.closed }.map { it.conversation().conversationId }.toSet()
+            val direct = service.conversationSummaries().filter { it.conversationId !in groupConversations }.mapNotNull { summary ->
                 val items = runCatching { service.timeline(summary.conversationId) }.getOrNull()
                     ?: return@mapNotNull null
-                val last = items.lastOrNull() ?: return@mapNotNull null
+                val visible = items.filter { it.controlCanonical == null }
+                val last = visible.lastOrNull() ?: return@mapNotNull null
                 // The other participant, which is what a person thinks of the conversation as. The
                 // descriptor lists both, so "not me" identifies them without a lookup.
                 val peer = summary.participantUserIds.firstOrNull { it != identity.user.userId }
@@ -166,13 +179,28 @@ fun EidoHomeApp(
                     lastAtMs = last.createdAtMs,
                     lastOutgoing = last.outgoing,
                     lastDelivered = (delivered[peer] ?: 0L) >= last.createdAtMs,
-                    messageCount = items.size,
+                    messageCount = visible.size,
                 )
-            }.sortedByDescending { it.lastAtMs }
-        }.getOrDefault(emptyList())
+            }
+            val grouped = groupRecords.map { record ->
+                val state = record.state
+                val items = groupService.timeline(state.groupId)
+                val last = items.lastOrNull()
+                ChatRow(state.groupId, "", state.title,
+                    last?.caption ?: (groupReadOnlyReason(record, identity.user.userId) ?: "Участники: ${state.members.size}"),
+                    last?.createdAtMs ?: state.createdAtMs, last?.outgoing ?: false,
+                    last?.let { groupService.delivered(state.groupId, it.messageId, delivered) } ?: false,
+                    items.size, groupId = state.groupId)
+            }
+            (direct + grouped).sortedByDescending { it.lastAtMs }
+        }.onFailure { status = "Не удалось открыть переписку: ${it.message}" }.getOrDefault(chats)
         // Keep an open conversation in step with what was just reloaded.
         openChat?.let { row ->
-            openChatItems = runCatching { service.timeline(row.conversationId) }.getOrDefault(emptyList())
+            openChat = chats.firstOrNull { it.conversationId == row.conversationId } ?: row
+            openChatItems = runCatching {
+                row.groupId?.let(groupService::timeline)
+                    ?: service.timeline(row.conversationId).filter { it.controlCanonical == null }
+            }.getOrDefault(emptyList())
         }
     }
 
@@ -187,6 +215,20 @@ fun EidoHomeApp(
     // `refresh`, not `reloadInbox`: the ticks are stale the moment the app was last closed, because
     // segments keep being collected while it is in the background.
     LaunchedEffect(Unit) { refresh() }
+    // Durable fan-out resumes after process death. An unavailable peer never blocks the chat UI.
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.IO) { runCatching { groupService.recoverPendingMessages() } }
+        while (true) {
+            val attempted = withContext(Dispatchers.IO) {
+                if (groupService.pending().isNotEmpty()) {
+                    runCatching { flushGroupOutbox(context, service, groupService) }
+                    true
+                } else false
+            }
+            if (attempted) refresh()
+            kotlinx.coroutines.delay(30_000)
+        }
+    }
     // Bring this device's own address up as soon as the app opens. Tor takes a minute or two even
     // when nothing is wrong, and waiting until the first send would mean the first card exported
     // after a fresh install carried no address at all.
@@ -360,6 +402,81 @@ fun EidoHomeApp(
         }
     }
 
+    fun sendGroupEntry(groupId: String, entry: EidogramCatalogStore.Entry) {
+        sending = SendProgress(groupService.group(groupId).state.title, "Готовлю сообщение участникам…")
+        scope.launch {
+            val queued = withContext(Dispatchers.IO) {
+                runCatching {
+                    groupService.send(groupId, entry.document, entry.caption)
+                    val peers = groupService.group(groupId).state.members.map { it.userId }.filter { it != identity.user.userId }
+                    val at = System.currentTimeMillis()
+                    catalog.save(entry.copy(sentTo = (entry.sentTo + peers).distinct(),
+                        sentAtMs = entry.sentAtMs + peers.associateWith { at }))
+                }
+            }
+            sending = null
+            status = queued.fold({ "Сообщение сохранено и отправляется участникам" }, { "Не отправлено: ${it.message}" })
+            refresh()
+            if (queued.isSuccess) scope.launch {
+                status = withContext(Dispatchers.IO) { flushGroupOutbox(context, service, groupService, groupId) }
+                refresh()
+            }
+        }
+    }
+
+    fun changeGroup(action: () -> GroupConversationRecord) {
+        sending = SendProgress("Группа", "Сохраняю изменения…")
+        scope.launch {
+            val changed = withContext(Dispatchers.IO) { runCatching(action) }
+            changed.onSuccess { record ->
+                tab = 1
+                refresh()
+                if (record.canWrite(identity.user.userId)) {
+                    openChat = chats.firstOrNull { it.groupId == record.groupId }
+                    openChatItems = groupService.timeline(record.groupId)
+                }
+                sending = null
+                // The group is usable immediately; publish its persistent queue in the background.
+                scope.launch {
+                    status = withContext(Dispatchers.IO) { runCatching {
+                        flushGroupOutbox(context, service, groupService, record.groupId)
+                    }.getOrElse { "Изменения сохранены; доставка ожидает сети: ${it.message}" } }
+                    refresh()
+                }
+            }.onFailure { sending = null; status = "Не удалось изменить группу: ${it.message}" }
+        }
+    }
+
+    if (creatingGroup || editingGroup != null) {
+        val initial = editingGroup
+        GroupEditorDialog(contacts, identity.user.userId, initial,
+            onDismiss = { creatingGroup = false; editingGroup = null },
+            onConfirm = { name, members ->
+                creatingGroup = false; editingGroup = null
+                changeGroup {
+                    if (initial == null) groupService.create(name, members)
+                    else groupService.update(initial.groupId, name, members)
+                }
+            })
+    }
+    inspectingGroup?.let { id ->
+        val record = groupRecords.firstOrNull { it.groupId == id }
+        if (record != null) GroupInfoDialog(record, identity.user.userId,
+            onDismiss = { inspectingGroup = null },
+            onEdit = { inspectingGroup = null; editingGroup = record },
+            onLeave = { inspectingGroup = null; leavingGroup = id })
+    }
+    leavingGroup?.let { id ->
+        val owner = groupService.group(id).state.ownerUserId == identity.user.userId
+        AlertDialog(onDismissRequest = { leavingGroup = null },
+            title = { Text(if (owner) "Закрыть группу для всех?" else "Выйти из группы?") },
+            text = { Text(if (owner) "Участники больше не смогут писать после получения изменения. Полученная история сохранится."
+                else "Вы перестанете получать новые сообщения. Полученная история сохранится.") },
+            confirmButton = { TextButton(onClick = { leavingGroup = null; changeGroup { groupService.leave(id) } }) {
+                Text(if (owner) "Закрыть группу" else "Выйти") } },
+            dismissButton = { TextButton(onClick = { leavingGroup = null }) { Text("Отмена") } })
+    }
+
     composing?.let { target ->
         ComposeEidogramScreen(
             target = target,
@@ -382,14 +499,18 @@ fun EidoHomeApp(
                 // it to would be a dialog with exactly one answer. It is still saved to the
                 // catalogue first — the catalogue is the author's own record, not an outbox.
                 val to = replyTo?.let { peer -> contacts.firstOrNull { it.userId == peer } }
+                val toGroup = replyToGroup
                 replyTo = null
-                if (to != null) {
+                replyToGroup = null
+                if (toGroup != null) {
+                    sendGroupEntry(toGroup, saved)
+                } else if (to != null) {
                     sendEntry(to, saved)
                 } else {
                     status = if (base != null) "Эйдограмма изменена" else "Эйдограмма сохранена"
                 }
             },
-            onCancel = { composing = null },
+            onCancel = { composing = null; replyTo = null; replyToGroup = null },
         )
         return
     }
@@ -449,13 +570,17 @@ fun EidoHomeApp(
                             runCatching {
                                 var total = 0
                                 val problems = mutableListOf<String>()
-                                contacts.forEach { c ->
+                                val queued = ArrayDeque(service.contactSummaries())
+                                val polled = mutableSetOf<String>()
+                                while (queued.isNotEmpty() && polled.size < 128) {
+                                    val c = queued.removeFirst()
+                                    if (!polled.add(c.userId)) continue
                                     // A contact with no publisher certificate can never deliver, so
                                     // there is nothing to look up and nothing to poll — and doing
                                     // both anyway spent a network round trip per phantom contact.
                                     if (ContactPublisherStore(context).get(c.userId) == null) {
                                         problems += "${c.alias}: нет ключа публикации — добавьте заново"
-                                        return@forEach
+                                        continue
                                     }
                                     // Before asking, make sure we still know where to ask. A
                                     // contact introduced before their address existed has none.
@@ -466,6 +591,15 @@ fun EidoHomeApp(
                                     )
                                     total += r.admitted
                                     r.problem?.let { problems += "${c.alias}: $it" }
+                                    runCatching {
+                                        groupService.consume(groupService.pairConversation(c.userId)) { problems += it }
+                                        importGroupDeliveryCards(context, service, groupService)
+                                    }.onFailure { problems += it.message.orEmpty() }
+                                    service.contactSummaries().filter { it.userId !in polled }
+                                        .forEach { queued.addLast(it) }
+                                }
+                                if (groupService.pending().isNotEmpty()) scope.launch(Dispatchers.IO) {
+                                    runCatching { flushGroupOutbox(context, service, groupService) }
                                 }
                                 // Tidy the locker: anything already collected has no reason to
                                 // sit on a server.
@@ -515,15 +649,6 @@ fun EidoHomeApp(
                     text = { Text("Создать") },
                     icon = {},
                 )
-                // A conversation you can only read is half a conversation.
-                tab == 1 && openChat != null -> ExtendedFloatingActionButton(
-                    onClick = {
-                        replyTo = openChat?.peerUserId
-                        composing = ComposeTarget(null, copy = false)
-                    },
-                    text = { Text("Написать") },
-                    icon = {},
-                )
                 else -> Unit
             }
         },
@@ -549,15 +674,27 @@ fun EidoHomeApp(
                             avatarOf = { ContactAvatarStore(context).get(it) },
                             onOpen = {
                                 openChat = it
-                                openChatItems = runCatching { service.timeline(it.conversationId) }
+                                openChatItems = runCatching { it.groupId?.let(groupService::timeline)
+                                    ?: service.timeline(it.conversationId).filter { item -> item.controlCanonical == null } }
                                     .getOrDefault(emptyList())
                             },
+                            onCreateGroup = { creatingGroup = true },
                         )
                     } else {
+                        val group = row.groupId?.let { id -> groupRecords.firstOrNull { it.groupId == id } }
                         ChatScreen(
                             title = row.title,
                             items = openChatItems,
                             deliveredThroughMs = deliveredThrough[row.peerUserId] ?: 0L,
+                            onWrite = if (group == null || group.canWrite(identity.user.userId)) ({
+                                replyTo = row.peerUserId.takeIf { row.groupId == null }
+                                replyToGroup = row.groupId
+                                composing = ComposeTarget(null, copy = false)
+                            }) else null,
+                            onParticipants = if (group != null) ({ inspectingGroup = group.groupId }) else null,
+                            readOnlyReason = group?.let { groupReadOnlyReason(it, identity.user.userId) },
+                            senderName = if (group != null) ({ uid -> contacts.firstOrNull { it.userId == uid }?.alias ?: uid.take(12) }) else null,
+                            isDelivered = if (group != null) ({ item -> groupService.delivered(group.groupId, item.messageId, deliveredThrough) }) else null,
                             onExport = {
                                 scope.launch {
                                     status = withContext(Dispatchers.IO) {
@@ -566,6 +703,10 @@ fun EidoHomeApp(
                                                 context, row.title, openChatItems,
                                                 { item -> renderEidogram(item.document) },
                                                 "чат-${row.title.replace(Regex("[^\\p{L}\\d]"), "-")}.docx",
+                                                senderName = if (group != null) ({ item ->
+                                                    if (item.outgoing) "Вы" else contacts.firstOrNull { it.userId == item.senderUserId }?.alias
+                                                        ?: item.senderUserId.take(12)
+                                                }) else null,
                                             )
                                             withContext(Dispatchers.Main) {
                                                 Sharing.file(context, file, ChatDocx.MIME, "Отправить переписку")

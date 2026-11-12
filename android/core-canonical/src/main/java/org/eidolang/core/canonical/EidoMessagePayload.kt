@@ -17,9 +17,12 @@ import org.eidolang.core.model.EidogramDocumentV1
 data class EidoMessagePayloadV1(
     val document: EidogramDocumentV1,
     val caption: String,
+    /** Encrypted service data. Absent on ordinary messages, preserving their canonical bytes. */
+    val controlCanonical: String? = null,
 ) {
     init {
         require(caption.length <= MAX_CAPTION) { "caption exceeds $MAX_CAPTION characters" }
+        require(controlCanonical == null || controlCanonical.length <= 4 * 1024 * 1024) { "Слишком большое служебное сообщение" }
     }
 
     companion object {
@@ -35,7 +38,7 @@ object EidoMessagePayloadCanonical {
             "caption" to CanonicalJson.string(p.caption),
             "document" to EidogramCanonical.documentJson(p.document),
             "payload_version" to CanonicalJson.string(EidoMessagePayloadV1.VERSION),
-        )
+        ) + (p.controlCanonical?.let { mapOf("control" to CanonicalJson.string(it)) } ?: emptyMap())
     )
 
     /**
@@ -50,7 +53,8 @@ object EidoMessagePayloadCanonical {
             return EidoMessagePayloadV1(EidogramParser.parseCanonical(text), "")
         }
         require(version == EidoMessagePayloadV1.VERSION) { "Unsupported payload version $version" }
-        require(root.fields.keys == setOf("caption", "document", "payload_version")) {
+        require(root.fields.keys == setOf("caption", "document", "payload_version") ||
+            root.fields.keys == setOf("caption", "document", "payload_version", "control")) {
             "Unexpected payload fields: ${root.fields.keys}"
         }
         val caption = (root.fields["caption"] as? JValue.Str)?.value
@@ -60,6 +64,7 @@ object EidoMessagePayloadCanonical {
         return EidoMessagePayloadV1(
             EidogramParser.parseCanonical(CanonicalReserialize.of(document)),
             caption,
+            root.fields["control"]?.let { (it as? JValue.Str)?.value ?: error("Invalid control payload") },
         )
     }
 }

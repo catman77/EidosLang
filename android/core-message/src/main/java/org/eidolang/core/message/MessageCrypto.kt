@@ -28,6 +28,7 @@ object MessageCrypto {
         createdAtMs: Long,
         parentMessageIds: Collection<String> = emptyList(),
         random: SecureRandom = SecureRandom(),
+        controlCanonical: String? = null,
     ): EidogramMessageV1 {
         require(senderSeq >= 0)
         require(createdAtMs >= 0)
@@ -62,7 +63,7 @@ object MessageCrypto {
         )
         val aadBytes = MessageCanonical.aadJson(aad).toByteArray(Charsets.UTF_8)
         val plaintext = EidoMessagePayloadCanonical
-            .json(EidoMessagePayloadV1(document, caption))
+            .json(EidoMessagePayloadV1(document, caption, controlCanonical))
             .toByteArray(Charsets.UTF_8)
 
         val messageKey = JcaCrypto.randomBytes(CryptoSuiteV1.AES_KEY_BYTES, random)

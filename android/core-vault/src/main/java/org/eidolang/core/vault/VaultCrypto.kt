@@ -102,12 +102,13 @@ object HistoryVaultCrypto {
         document:EidogramDocumentV1,
         random:SecureRandom=SecureRandom(),
         caption:String="",
+        controlCanonical:String?=null,
     ):HistoryVaultEntryV1{
         val message=MessageParser.parseCanonical(messageEnvelopeCanonicalJson)
         require(openedEpoch.epoch.body.vaultId==descriptor.vaultId)
-        val documentRaw=if(caption.isEmpty()) EidogramCanonical.documentJson(document)
+        val documentRaw=if(caption.isEmpty() && controlCanonical==null) EidogramCanonical.documentJson(document)
             else org.eidolang.core.canonical.EidoMessagePayloadCanonical.json(
-                org.eidolang.core.canonical.EidoMessagePayloadV1(document,caption))
+                org.eidolang.core.canonical.EidoMessagePayloadV1(document,caption,controlCanonical))
         val payload=HistoryVaultEntryPayloadV1(
             messageEnvelopeCanonicalJson,
             documentRaw,

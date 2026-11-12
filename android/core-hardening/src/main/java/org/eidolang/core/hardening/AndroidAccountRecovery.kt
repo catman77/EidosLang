@@ -88,7 +88,7 @@ object AndroidAccountRecovery {
         return recovery
     }
 
-    fun snapshot(context: Context, identity: DevicePrivateCrypto): ByteArray = synchronized(lock) {
+    fun snapshot(context: Context, identity: DevicePrivateCrypto): ByteArray = synchronized(GroupPersistence.lock) { synchronized(lock) {
         val portable = recoveryIdentity(context, identity)
         val repo = AndroidMessengerRepositoryProvider.get(context)
         val mirror = InMemoryMessengerRepository()
@@ -132,7 +132,7 @@ object AndroidAccountRecovery {
             validate(out).close()
             out
         } finally { rawSecret.fill(0) }
-    }
+    } }
 
     class Validated internal constructor(
         val identity: PortableIdentity, val history: String, val secret: HistoryVaultRecoverySecret,
@@ -291,7 +291,7 @@ object AndroidAccountRecovery {
     private fun allowed(path: String) = path == "eidolang-profile-v1.bin" || path == "eidolang-archive-publisher-v1.bin" ||
         path in setOf("relay-host.txt", "directory-listed.flag", "directory-confirmed.txt") ||
         path.matches(Regex("eidogram-draft-[0-9a-f]{20}\\.bin")) ||
-        path.matches(Regex("(eidogram-catalog|contact-avatars|contact-publishers|delivery-ledger)/[A-Za-z0-9._-]{1,160}\\.bin")) ||
+        path.matches(Regex("(eidogram-catalog|contact-avatars|contact-publishers|delivery-ledger|group-chats)/[A-Za-z0-9._-]{1,160}\\.bin")) ||
         path.matches(Regex("onion/card/[0-9a-f]{64}\\.json")) || path == "onion/current-card.json" ||
         path.matches(Regex("contact-onion/[0-9a-f]{64}\\.txt"))
 
@@ -307,6 +307,7 @@ object AndroidAccountRecovery {
         path.startsWith("contact-avatars/") -> "contact-avatar" to File(path).name.removeSuffix(".bin")
         path.startsWith("contact-publishers/") -> "contact-publisher" to File(path).name.removeSuffix(".bin")
         path.startsWith("delivery-ledger/") -> "delivery-ledger" to File(path).name.removeSuffix(".bin")
+        path.startsWith("group-chats/") -> "group-chat" to File(path).name.removeSuffix(".bin")
         else -> null
     }
 

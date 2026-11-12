@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,14 +20,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.eidolang.core.repository.TimelineItem
@@ -49,6 +54,7 @@ data class ChatRow(
     /** For an outgoing last message: has the peer collected it. See [DeliveryLedger]. */
     val lastDelivered: Boolean,
     val messageCount: Int,
+    val groupId: String? = null,
 )
 
 /**
@@ -63,17 +69,23 @@ fun ChatsScreen(
     rows: List<ChatRow>,
     avatarOf: (String) -> ByteArray?,
     onOpen: (ChatRow) -> Unit,
+    onCreateGroup: (() -> Unit)? = null,
 ) {
+    Column(Modifier.fillMaxSize()) {
+    if (onCreateGroup != null) {
+        TextButton(onClick = onCreateGroup, modifier = Modifier.align(Alignment.End).padding(horizontal = 8.dp)) {
+            Text("Создать группу")
+        }
+    }
     if (rows.isEmpty()) {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
             Text("Переписки пока нет. Добавьте контакт и отправьте эйдограмму.")
         }
-        return
-    }
-    LazyColumn(Modifier.fillMaxSize()) {
+    } else LazyColumn(Modifier.weight(1f).fillMaxWidth()) {
         items(rows, key = { it.conversationId }) { row ->
             ListItem(
-                leadingContent = { ChatAvatar(row.title, avatarOf(row.peerUserId)) },
+                leadingContent = { ChatAvatar(if (row.groupId != null) "Г" else row.title,
+                    if (row.groupId == null) avatarOf(row.peerUserId) else null) },
                 headlineContent = { Text(row.title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 supportingContent = {
                     Text(
@@ -86,6 +98,7 @@ fun ChatsScreen(
                 modifier = Modifier.clickable { onOpen(row) },
             )
         }
+    }
     }
 }
 
@@ -103,38 +116,47 @@ fun ChatScreen(
     items: List<TimelineItem>,
     deliveredThroughMs: Long,
     onExport: () -> Unit = {},
+    onWrite: (() -> Unit)? = null,
+    senderName: ((String) -> String)? = null,
+    onParticipants: (() -> Unit)? = null,
+    readOnlyReason: String? = null,
+    isDelivered: ((TimelineItem) -> Boolean)? = null,
 ) {
     val state = rememberLazyListState()
     // A column, so the export row sits above the messages and the list takes the rest.
     // Open at the newest message, as every messenger does; the top of a long history is not where
     // anybody wants to start.
-    LaunchedEffect(items.size) {
+    LaunchedEffect(items.size, LocalDensity.current.fontScale) {
         if (items.isNotEmpty()) state.scrollToItem(items.lastIndex)
-    }
-    if (items.isEmpty()) {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("Здесь пока пусто.")
-        }
-        return
     }
     Column(Modifier.fillMaxSize()) {
     Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp), horizontalArrangement = Arrangement.End) {
+        if (onParticipants != null) TextButton(onClick = onParticipants) { Text("Участники") }
         androidx.compose.material3.TextButton(onClick = onExport) { Text("Выгрузить в Word") }
     }
-    LazyColumn(Modifier.weight(1f).padding(horizontal = 8.dp), state = state) {
+    if (items.isEmpty()) {
+        Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Text("Здесь пока пусто.")
+        }
+    } else LazyColumn(Modifier.weight(1f).padding(horizontal = 8.dp), state = state) {
         items(items, key = { it.messageId }) { item ->
             Row(
                 Modifier.fillMaxWidth().padding(vertical = 4.dp),
                 horizontalArrangement = if (item.outgoing) Arrangement.End else Arrangement.Start,
             ) {
                 Column(
-                    Modifier.widthIn(max = 280.dp).clip(RoundedCornerShape(12.dp))
+                    Modifier.testTag("chatMessage-${item.messageId}").widthIn(max = 280.dp).clip(RoundedCornerShape(12.dp))
                         .background(
                             if (item.outgoing) MaterialTheme.colorScheme.primaryContainer
                             else MaterialTheme.colorScheme.surfaceVariant
                         )
                         .padding(8.dp),
                 ) {
+                    if (!item.outgoing && senderName != null) {
+                        Text(senderName(item.senderUserId), style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary)
+                        Spacer(Modifier.height(4.dp))
+                    }
                     EidogramViewer(item.document, Modifier.size(140.dp))
                     if (item.caption.isNotBlank()) {
                         Spacer(Modifier.height(6.dp))
@@ -148,7 +170,7 @@ fun ChatScreen(
                             // The same two ticks as in the catalogue, and the same narrow meaning:
                             // the segment carrying this message was collected from this device.
                             Text(
-                                if (deliveredThroughMs >= item.createdAtMs) "✓✓" else "✓",
+                                if (isDelivered?.invoke(item) ?: (deliveredThroughMs >= item.createdAtMs)) "✓✓" else "✓",
                                 style = MaterialTheme.typography.labelSmall,
                             )
                         }
@@ -157,6 +179,12 @@ fun ChatScreen(
             }
         }
     }
+    if (onWrite != null) {
+        Row(Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.End) {
+            Button(onClick = onWrite, modifier = Modifier.heightIn(min = 56.dp)) { Text("Написать") }
+        }
+    }
+    readOnlyReason?.let { Text(it, Modifier.fillMaxWidth().padding(16.dp), style = MaterialTheme.typography.bodyMedium) }
     }
 }
 

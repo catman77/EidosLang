@@ -36,6 +36,7 @@ data class TimelineItem(
     val document: EidogramDocumentV1,
     /** Author's words for the eidogram; empty for anything written before R22.2. */
     val caption: String = "",
+    val controlCanonical: String? = null,
 )
 
 class LocalMessengerService(
@@ -299,12 +300,22 @@ class LocalMessengerService(
         document: EidogramDocumentV1,
         createdAtMs: Long,
         caption: String = "",
+        controlCanonical: String? = null,
     ): EidogramMessageV1 {
         val conversation = conversationDescriptor(conversationId)
         require(isDeviceActive(localIdentity.user.userId, localIdentity.certificate.deviceId)) { "Current device is revoked" }
         val recipients = recipientDevices(conversation)
         val seq = nextSenderSeq(conversationId, localIdentity.certificate.deviceId)
-        val parents = currentHeads(conversationId)
+        val heads = currentHeads(conversationId)
+        // A large group may have more concurrent authors than the wire's 16-parent bound.
+        // Merge a bounded frontier while retaining this device's own causal chain; untouched
+        // heads remain in the repository and can be merged by subsequent messages.
+        val parents = if (heads.size <= 16) heads else {
+            val ownPrevious = repository.messages(conversationId)
+                .filter { it.senderDeviceId == localIdentity.certificate.deviceId }
+                .maxByOrNull { it.senderSeq }?.messageId
+            (listOfNotNull(ownPrevious) + heads).distinct().take(16).sorted()
+        }
         val message = MessageCrypto.seal(
             document = document,
             caption = caption,
@@ -315,6 +326,7 @@ class LocalMessengerService(
             createdAtMs = createdAtMs,
             parentMessageIds = parents,
             random = random,
+            controlCanonical = controlCanonical,
         )
         // Admission of our own envelope through the same cryptographic boundary.
         val opened = MessageCrypto.open(message, localIdentity.user, localIdentity.certificate, localIdentity, conversation)
@@ -389,6 +401,7 @@ class LocalMessengerService(
                 localState = r.localState,
                 document = payload.document,
                 caption = payload.caption,
+                controlCanonical = payload.controlCanonical,
             )
         }
     }

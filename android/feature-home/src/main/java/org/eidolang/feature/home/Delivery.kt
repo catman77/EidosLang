@@ -304,9 +304,11 @@ object Relay {
             doOutput = true
             setFixedLengthStreamingMode(bencoded.size)
             outputStream.use { it.write(bencoded) }
-            responseCode == 200
+            val code = responseCode
+            if (code != 200) println("RELAY head rejected: HTTP $code ${errorStream?.bufferedReader()?.use { it.readText().take(256) }}")
+            code == 200
         }
-    }.getOrDefault(false)
+    }.onFailure { println("RELAY head failed: ${it.javaClass.simpleName}: ${it.message}") }.getOrDefault(false)
 
     fun getHead(target: String): ByteArray? = runCatching {
         open("/head/$target", "GET").run {
@@ -411,9 +413,11 @@ object Relay {
             doOutput = true
             setFixedLengthStreamingMode(bytes.size)
             outputStream.use { it.write(bytes) }
-            responseCode == 200
+            val code = responseCode
+            if (code != 200) println("RELAY segment rejected: HTTP $code ${errorStream?.bufferedReader()?.use { it.readText().take(256) }}")
+            code == 200
         }
-    }.getOrDefault(false)
+    }.onFailure { println("RELAY segment failed: ${it.javaClass.simpleName}: ${it.message}") }.getOrDefault(false)
 
     fun getSegmentFile(infoHashV2Hex: String, path: String): ByteArray? = runCatching {
         open("/segment/$infoHashV2Hex/${pathKey(path)}", "GET").run {
@@ -583,6 +587,7 @@ fun publishConversation(
     identity: DevicePrivateCrypto,
     conversationId: String,
     contactBundleCanonical: String,
+    onOfflineCopyReady: (Boolean) -> Unit = {},
 ): String {
     EidoRelaySettings.apply(context)
     val conversation = service.conversationDescriptor(conversationId)
@@ -645,6 +650,7 @@ fun publishConversation(
     // has to feel immediate; the copy is removed once it has been picked up.
     val inLocker =
         runCatching { RelayDelivery.publish(segment, head.targetSha1Hex, headBytes) }.getOrDefault(false)
+    onOfflineCopyReady(inLocker)
     // Remember that these bytes are owed to this contact, so the moment they are collected can be
     // recognised. Without it a send is indistinguishable from a message that will sit here forever.
     DeliveryLedger(context).published(
